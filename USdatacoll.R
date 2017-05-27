@@ -220,7 +220,7 @@ tbill_rate_10y <- as.xts(fredr_series(series_id='DGS10',frequency='q'))
 ## Scraping Yahoo! Finance
 
 # determine current date, adapt the Yahoo! URL
-sp_ret <- read_csv(paste0('http://finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=1950&d=',
+sp_ret <- read_csv(paste0('http://chart.finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=1950&d=',
                           as.numeric(format(Sys.Date(), '%m')), 
                           '&e=', as.numeric(format(Sys.Date(), '%d')), 
                           '&f=', as.numeric(format(Sys.Date(), '%Y')), 
@@ -235,7 +235,7 @@ sp_ret <- read_csv(paste0('http://finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=
                      `Adj Close` = col_double()
                    ))
 
-sp_ret <- getSymbols(src='google', Symbols='^GSPC',
+sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',
                      from='1950-01-03',
                      to=format(Sys.Date(), '%Y-%m-%d'))
 # adapts the order of the observations
