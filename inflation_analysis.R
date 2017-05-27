@@ -197,11 +197,32 @@ cat('\nThe most likely break for \'deflt1\' is at date ',
 # be worth it to check back the time series for such date
 
 
+##### TENTATIVE VAR #####
+library(vars)
+varia <- merge(db_US$realtime_gap, db_US$ffr, db_US$deflt1, db_US$deflt, db_US$spread_sp_3m)
 
+vect <- VAR(varia['1967-01/2011-12'], lag.max=8, type='const', ic='AIC')
+summary(vect)
+impulses <- irf(vect)
 
+amatrix <- matrix(c(NA,NA,NA,0,0,
+            NA,NA,NA,0,NA,
+            0,NA,NA,0,0,
+            NA,0,NA,NA,0,
+            NA,NA,0,0,NA), 
+            nrow=5, ncol=5, byrow=T)
 
+bmatrix <- matrix(c(NA,NA,NA,0,0,
+                    NA,NA,NA,0,NA,
+                    0,NA,NA,0,0,
+                    NA,0,NA,NA,0,
+                    0,0,NA,0,NA), 
+                  nrow=5, ncol=5, byrow=T)
+sbar <- SVAR(vect, Amat=amatrix, estmethod='direct', hessian=T, method='CG')#, start=rep(1, 10))
+summary(sbar)
 
-
+impulseSVAR <- irf(sbar)
+plot(impulseSVAR)
 
 # housekeeping
 # dev.off()
