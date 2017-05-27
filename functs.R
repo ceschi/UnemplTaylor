@@ -163,3 +163,6 @@ pkgs <- c('vars', 'MSwM','tidyverse',
 # fill pkgs with names of the packages to install
 
 instant_pkgs(pkgs)
+
+
+rm(pkgs)

@@ -103,5 +103,54 @@ cat('\n\n\n\n us_reg_1 is standard Taylor Rule regression\n',
 
 
 
+
+##### VAR #####
+# Model: y_t = A_i y_{t-1} + \eps_t
+
+variables <- merge(db_US$realtime_gap,          # realtime output gap
+                   db_US$ffr,                   # federal fund rate
+                   db_US$deflt1,                # one period ahead GDP deflator forecast
+                   db_US$deflt,                 # current GDP deflator nowcast
+                   db_US$spread_sp_3m)          # SP500 v 3MTBill spread
+
+VAR_spread <- VAR(varia['1967-01/2011-12'],     # period subsample, to exclude NAs
+                  lag.max=8,                    # max lags to select
+                  type='const',                 # VAR includes a vector for intercepts
+                  ic='AIC')                     # selection criterion for optimal lags
+
+
+summary(VAR_spread)                             # prints estimates
+
+
+IRF_VAR_spread <- irf(VAR_spread)               # prints IRFs for VAR with spread
+
+#### SVAR ####
+# Model: Ay_t = A_i y_{t-1} + \eps_t
+
+# Declare A matrix 
+SVAR_Amat <- matrix(c(NA,NA,NA,0,0,
+                      NA,NA,NA,0,NA,
+                      0,NA,NA,0,0,
+                      NA,0,NA,NA,0,
+                      NA,NA,0,0,NA), 
+                    nrow=5, ncol=5, byrow=T)
+
+SVAR_Amat_alt <- matrix(c(NA,NA,NA,0,0,
+                          NA,NA,NA,0,NA,
+                          0,NA,NA,0,0,
+                          NA,0,NA,NA,0,
+                          0,0,NA,0,NA), 
+                        nrow=5, ncol=5, byrow=T) # alternative A matrix specification
+
+SVAR_spread <- SVAR(VAR_spread,
+                    Amat=SVAR_Amat,
+                    Bmat=NULL,
+                    estmethod='direct', hessian=T, method='CG')
+
+IRF_SVAR_spread <- irf(SVAR_spread)
+
+plot(IRF_SVAR_spread)
+
+
 # housekeeping
-rm()
+# rm()

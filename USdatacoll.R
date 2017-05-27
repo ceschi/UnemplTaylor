@@ -7,66 +7,8 @@
 # This code collects and scraps core data for the analysis
 # and puts it in xts format
 
-#### Packages calls ####
-library(xts)
-library(tseries)
-library(fredr)
-library(xlsx)
-library(dplyr)
-library(readr)
 
 
-#### Functions ####
-
-subfilter <- function(df){
-  indice <- as.character(unique(df$date))
-  len <- length(indice)
-  outp <- matrix(NA, ncol=ncol(df), nrow=len)
-  outp <- data.frame(outp)
-  names(outp) <- names(df)
-  for (i in 1:len){
-    #supp <- as.numeric(indice[i])
-    supp <- indice[i]
-    ram <- subset(df, date==supp)
-    outp[i,] <- ram[nrow(ram),]
-    outp[i,1] <- indice[i]
-  }
-  return(outp)
-}
-
-subfilter.mean <- function(df){
-  indice <- as.character(unique(df$date))
-  len <- length(indice)
-  outp <- matrix(NA, ncol=ncol(df), nrow=len)
-  outp <- data.frame(outp)
-  names(outp) <- names(df)
-  for (i in 1:len){
-    supp <- as.numeric(indice[i])
-    ram <- subset(df, date==supp)
-    outp[i,] <- c(0, as.numeric(apply(ram[,-1], 2, mean)))
-  }
-  outp[,1] <- indice
-  return(outp)
-}
-
-
-trendev<-function(mat){
-  matdat<-mat[,2:ncol(mat)]
-  temp<-1:nrow(mat)
-  temp2<-temp^2
-  regr<-function(x){
-    dta<-data.frame(x, temp, temp2)
-    names(dta)<-c('x', 'temp', 'temp2')
-    model<-lm(x~temp+temp2, data=dta)
-    GAPS<-(model$residuals/(x-model$residuals))
-    gaps<-as.matrix(na.omit(GAPS))
-    gap<-gaps[nrow(gaps)]
-    return(gap)
-  }
-  outcome<-apply(matdat, 2, regr)
-  outcome<-as.matrix(outcome)
-  return(outcome*100)
-}
 
 #### Scraping US data ####
 # #### Getting set up and creating folders ####
