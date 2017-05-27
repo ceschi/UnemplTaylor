@@ -38,8 +38,6 @@ instant_pkgs <- function(pkgs) {
 }
 
 
-
-
 repara <- function(x, rho=4){
   # function to reparametrize once a lm is estimated 
   # having on the 4th place the persistence parameter for FFR
@@ -148,3 +146,20 @@ formula.maker <- function(df, y){
   attr(fomu, which='.Environment') <- .GlobalEnv
   return(fomu)
 }
+
+
+
+
+
+
+##### Packages Loader #####
+
+pkgs <- c('vars', 'MSwM','tidyverse',
+          'tseries', 'dynlm', 'stargazer',
+          'dyn', 'strucchange', 'xts',
+          'MASS', 'car', 'ggplot2',
+          'mFilter', 'fredr', 'xlsx',
+          'dplyr', 'readr')
+# fill pkgs with names of the packages to install
+
+instant_pkgs(pkgs)
