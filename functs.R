@@ -159,7 +159,7 @@ pkgs <- c('vars', 'MSwM','tidyverse',
           'dyn', 'strucchange', 'xts',
           'MASS', 'car', 'ggplot2',
           'mFilter', 'fredr', 'xlsx',
-          'dplyr', 'readr')
+          'dplyr', 'readr', 'quantmod')
 # fill pkgs with names of the packages to install
 
 instant_pkgs(pkgs)
