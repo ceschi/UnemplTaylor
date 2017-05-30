@@ -159,10 +159,17 @@ pkgs <- c('vars', 'MSwM','tidyverse',
           'dyn', 'strucchange', 'xts',
           'MASS', 'car', 'ggplot2',
           'mFilter', 'fredr', 'xlsx',
-          'dplyr', 'readr')
+          'dplyr', 'readr', 'quantmod',
+          'devtools')
 # fill pkgs with names of the packages to install
 
 instant_pkgs(pkgs)
 
+## part needed for handling Yahoo! finance data,
+## supposed to change w/ next release of 'quantmod' pkg
+## requires installation of 'Rtools' to compile
+
+devtools::install_github("joshuaulrich/quantmod", ref="157_yahoo_502")
+library(quantmod)
 
 rm(pkgs)
