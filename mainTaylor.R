@@ -7,7 +7,7 @@
 # for US (Trulyfinal.R) and for the panel building
 
 #### Functions #####
-source('functs.R')
+source('functs.R', verbose=F, echo=F)
 
 #### Directories
 working_directory <- getwd()
@@ -25,13 +25,13 @@ source("USdatacoll.R", verbose=F, echo=F)
 
 ##### VISUALIZATION ####
 
-source('visuals.R')
+source('visuals.R', verbose=F, echo=F)
 
 
 #### REGRESSIONS - SIMPLE ONES ####
 
 # US Data
-source('USreg.R')
+source('USreg.R', verbose=F, echo=F)
 
 
 #### REGRESSIONS - MORE SOPHISTICATED ####

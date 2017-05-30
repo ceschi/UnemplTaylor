@@ -219,30 +219,39 @@ tbill_rate_10y <- as.xts(fredr_series(series_id='DGS10',frequency='q'))
 
 ## Scraping Yahoo! Finance
 
-# determine current date, adapt the Yahoo! URL
-sp_ret <- read_csv(paste0('http://chart.finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=1950&d=',
-                          as.numeric(format(Sys.Date(), '%m')), 
-                          '&e=', as.numeric(format(Sys.Date(), '%d')), 
-                          '&f=', as.numeric(format(Sys.Date(), '%Y')), 
-                          '&g=m&ignore=.csv'),
-                   col_names=T, col_types = cols(
-                     Date = col_date(format = "%Y-%m-%d"),
-                     Open = col_double(),
-                     High = col_double(),
-                     Low = col_double(),
-                     Close = col_double(),
-                     Volume = col_double(),
-                     `Adj Close` = col_double()
-                   ))
+# # determine current date, adapt the Yahoo! URL
+# sp_ret <- read_csv(paste0('http://chart.finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=1950&d=',
+#                           as.numeric(format(Sys.Date(), '%m')), 
+#                           '&e=', as.numeric(format(Sys.Date(), '%d')), 
+#                           '&f=', as.numeric(format(Sys.Date(), '%Y')), 
+#                           '&g=m&ignore=.csv'),
+#                    col_names=T, col_types = cols(
+#                      Date = col_date(format = "%Y-%m-%d"),
+#                      Open = col_double(),
+#                      High = col_double(),
+#                      Low = col_double(),
+#                      Close = col_double(),
+#                      Volume = col_double(),
+#                      `Adj Close` = col_double()
+#                    ))
 
+# downloads daily prices time series through new Yahoo! API
+# to be fixed sooner than later
 sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',
                      from='1950-01-03',
-                     to=format(Sys.Date(), '%Y-%m-%d'))
-# adapts the order of the observations
-sp_ret <- sp_ret[order(-1:-nrow(sp_ret)),]
-sp_ret <- data.frame(sp_ret$Close)
-sp_ret <- as.xts(ts(sp_ret[1:(nrow(sp_ret)-1),], start=c(1950, 01), frequency=12))
-sp_ret <- diff(log(sp_ret))*100
+                     to=format(Sys.Date(), '%Y-%m-%d'),
+                     auto.assign = F)
+
+# aggregating up to quarterly data
+# through monthly upscaling
+sp_ret <- to.monthly(sp_ret)
+
+# adapts the order of the observations <- code for old API
+# sp_ret <- sp_ret[order(-1:-nrow(sp_ret)),]
+# sp_ret <- data.frame(sp_ret$sp_ret.Close)
+# sp_ret <- as.xts(ts(sp_ret[1:(nrow(sp_ret)-1),], start=c(1950, 01), frequency=12))
+
+sp_ret <- diff(log(sp_ret$sp_ret.Close))*100
 sp_ret <- as.xts(aggregate(sp_ret, as.yearqtr(as.yearmon(time(sp_ret))), mean))
 
 # one_year <- as.xts(fredr_series(series_id='DGS1', frequency='q'))
@@ -267,18 +276,20 @@ names(spreads) <- c('spread_baa', 'spread_sp_3m')
 # plot(sa_surplus)
 # 
 # # debt lvl
-# # money aggregates
-# 
-# base <- as.xts(fredr_series(series_id='BOGMBASE', frequency='q'))/1000
-# m1 <- as.xts(fredr_series(series_id='M1SL', frequency='q'))
-# m2 <- as.xts(fredr_series(series_id='M2SL', frequency='q'))
-# 
-# money <- merge(base, m1, m2)
-# names(money) <- c('base', 'm1', 'm2')
-# 
-# # monetary aggregates growth rates 
-# money_g <- diff(log(money))
-# names(money_g) <- c('base_g', 'm1_g', 'm2_g')
+
+
+#### MONEY AGGREGATES ####
+
+base <- as.xts(fredr_series(series_id='BOGMBASE', frequency='q'))/1000
+m1 <- as.xts(fredr_series(series_id='M1SL', frequency='q'))
+m2 <- as.xts(fredr_series(series_id='M2SL', frequency='q'))
+
+money <- merge(base, m1, m2)
+names(money) <- c('base', 'm1', 'm2')
+
+# monetary aggregates growth rates
+money_g <- diff(log(money))
+names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 # 
 # # spf data 
 
