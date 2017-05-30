@@ -2,6 +2,7 @@
 
 # A file to gather all home made functions with relative descriptions
 
+
 instant_pkgs <- function(pkgs) { 
   ## Function loading or installing packages in
   ## current R instance.

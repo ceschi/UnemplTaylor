@@ -263,17 +263,20 @@ names(spreads) <- c('spread_baa', 'spread_sp_3m')
 
 
 
-# #### Additional variables #####
-# # 
-# # deficit as % of gdp
-# surplus <- as.ts(fredr_series(series_id='M318501Q027NBEA', frequency='q'))
-# gdp <- as.ts(fredr_series(series_id='GDP', frequency='q', 
-#                            observation_start= as.Date(min(time(surplus)), format='%Y-%m-%d'),
-#                            observation_end= as.Date(max(time(surplus)), format='%Y-%m-%d')))
-# ratio <- 100*surplus/gdp
-# 
-# sa_surplus <- ratio$x - ratio$seasonal
-# plot(sa_surplus)
+#### Additional variables #####
+#
+# deficit as % of gdp
+surplus <- as.xts(fredr_series(series_id='M318501Q027NBEA'))#, frequency='q'))
+gdp <- as.xts(fredr_series(series_id='GDP', frequency='q',
+                           observation_start= as.Date(min(time(surplus)), format='%Y-%m-%d'),
+                           observation_end= as.Date(max(time(surplus)), format='%Y-%m-%d')))
+          # known unexpected behaviour: this call to fredr_series apparently downloads one year ahead
+
+ratio <- ts(100*surplus/gdp) 
+ratio.sa <- decompose(as.ts(ratio))
+
+sa_surplus <- ratio$x - ratio$seasonal
+plot(sa_surplus)
 # 
 # # debt lvl
 
