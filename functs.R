@@ -171,6 +171,9 @@ instant_pkgs(pkgs)
 ## requires installation of 'Rtools' to compile
 
 devtools::install_github("joshuaulrich/quantmod", ref="157_yahoo_502")
+devtools::install_github('sboysel/fredr')
+
 library(quantmod)
+library(fredr)
 
 rm(pkgs)
