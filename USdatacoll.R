@@ -7,7 +7,10 @@
 # This code collects and scraps core data for the analysis
 # and puts it in xts format
 
-
+if (singular___flag = 1){
+  source('functs.R')
+  cat('Single file execution')
+}
 
 
 #### Scraping US data ####
