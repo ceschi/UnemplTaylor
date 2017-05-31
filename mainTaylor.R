@@ -6,6 +6,13 @@
 # side goal: integrate smoothly this with previous codes
 # for US (Trulyfinal.R) and for the panel building
 
+
+#### Flagging
+
+singular___flag = 1
+# 0 -- the code runs entirely, all different parts
+# 1 -- when files are run singularily
+
 #### Functions #####
 source('functs.R', verbose=F, echo=F)
 

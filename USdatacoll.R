@@ -205,7 +205,7 @@ names(gap_output) <- c('realtime_gap', 'expost_gap')
 ##### SPREADS ####
 
 ## BAA 10Y bonds        !!! - DISCONTINUED BY FRED - !!!
-spread_baa <- as.xts(fredr_series(series_id='BAA10Y', frequency='q'))
+spread_baa <- as.xts(fredr_series(series_id='BAA10Y', frequency='q', aggregation_method=''))
 
 ## 3 months Tbill rate
 tbill_rate_3m <- as.xts(fredr_series(series_id='TB3MS',frequency='q'))
@@ -246,7 +246,7 @@ sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',
 # through monthly upscaling
 sp_ret <- to.monthly(sp_ret)
 
-# adapts the order of the observations <- code for old API
+# adapts the order of the observations                        <- code for old API
 # sp_ret <- sp_ret[order(-1:-nrow(sp_ret)),]
 # sp_ret <- data.frame(sp_ret$sp_ret.Close)
 # sp_ret <- as.xts(ts(sp_ret[1:(nrow(sp_ret)-1),], start=c(1950, 01), frequency=12))
@@ -264,24 +264,35 @@ names(spreads) <- c('spread_baa', 'spread_sp_3m')
 
 
 #### Additional variables #####
-#
-# deficit as % of gdp
-surplus <- as.xts(fredr_series(series_id='M318501Q027NBEA'))#, frequency='q'))
+
+#### DEFICIT as % OF GDP
+
+surplus_season <- as.xts(fredr_series(series_id='M318501Q027NBEA', frequency='q'))
+
+inizio <- as.Date(min(time(surplus_season)), format='%Y-%m-%d')
+fine <- as.Date(max(time(surplus_season)), format='%Y-%m-%d')
+
 gdp <- as.xts(fredr_series(series_id='GDP', frequency='q',
-                           observation_start= as.Date(min(time(surplus)), format='%Y-%m-%d'),
-                           observation_end= as.Date(max(time(surplus)), format='%Y-%m-%d')))
-          # known unexpected behaviour: this call to fredr_series apparently downloads one year ahead
+                           observation_start= inizio,
+                           observation_end= fine))
 
-ratio <- ts(100*surplus/gdp) 
-ratio.sa <- decompose(as.ts(ratio))
+# to deseasonalize one needs to get back to ts format
 
-sa_surplus <- ratio$x - ratio$seasonal
-plot(sa_surplus)
-# 
-# # debt lvl
+# surplus_ratio <- 100*surplus/gdp
+surplus.ts <- ts((100*surplus_season/gdp), frequency=4,
+                       start=c(year(inizio), quarter(inizio)),
+                       end=  c(year(fine), quarter(fine)))
+
+surplus_gdp <- decompose(surplus.ts)$x - decompose(surplus.ts)$seasonal
+surplus_gdp <- as.xts(surplus_gdp)
+names(surplus_gdp) <- 'surplus_gdp'
+ 
+#### DEBT 
 
 
-#### MONEY AGGREGATES ####
+
+
+#### MONEY AGGREGATES 
 
 base <- as.xts(fredr_series(series_id='BOGMBASE', frequency='q'))/1000
 m1 <- as.xts(fredr_series(series_id='M1SL', frequency='q'))
@@ -291,10 +302,13 @@ money <- merge(base, m1, m2)
 names(money) <- c('base', 'm1', 'm2')
 
 # monetary aggregates growth rates
-money_g <- diff(log(money))
+money_g <- diff(log(money))*100
 names(money_g) <- c('base_g', 'm1_g', 'm2_g')
-# 
-# # spf data 
+
+
+#### SPF DATA
+
+# automatize download of the xlsx file, import, run statistics and merge
 
 #### codes for next series: 
 
@@ -335,5 +349,6 @@ cols, gdp_waves, rates, ffrate, unemployment, gap_output,
 spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
-data_dir, base, m1, m2, money, money_g, gdp, surplus
+data_dir, base, m1, m2, money, money_g, gdp, surplus,
+inizio, fine, surplus.ts, decomposed_surplus
 )
