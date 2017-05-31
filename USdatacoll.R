@@ -288,9 +288,26 @@ surplus_gdp <- as.xts(surplus_gdp)
 names(surplus_gdp) <- 'surplus_gdp'
  
 #### DEBT 
+# debt to gdp series
+debt_gdp <- as.xts(fredr_series(series_id='GFDEGDQ188S', frequency='q'))
+
+# debt level, millions of $
+debt_lev <- as.xts(fredr_series(series_id='GFDEBTN'), frequency='q')
+
+# debt growth rate to proxy deficit
+debt_g <- diff(log(debt_lev))*100
 
 
+# debt held by FED, billions of $
+debt_fed <- as.xts(fredr_series(series_id = 'FDHBFRBN', frequency='q'))
 
+
+# percentage of debt held by FED
+debt_fed_share <- 100*(debt_fed*1000/debt_lev)
+
+
+fiscal <- merge(surplus_gdp, debt_g, debt_gdp, debt_fed, debt_fed_share)
+names(fiscal) <- c('surplus_gdp', 'debt_growth', 'debt_gdp', 'debt_fed', 'debt_fed_share')
 
 #### MONEY AGGREGATES 
 
@@ -316,7 +333,7 @@ names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 
 #### Merge to dataset ####
 
-db_US <- merge(rates, unemployment, gap_output, spreads, money)
+db_US <- merge(rates, unemployment, gap_output, spreads, money, fiscal)
 write.table(db_US, file.path(getwd(), data_dir, 'US_data.txt'), sep=';', row.names=F)
 
 
@@ -350,5 +367,6 @@ spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
 data_dir, base, m1, m2, money, money_g, gdp, surplus,
-inizio, fine, surplus.ts, decomposed_surplus
+inizio, fine, surplus.ts, decomposed_surplus, debt_fed,
+debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal
 )
