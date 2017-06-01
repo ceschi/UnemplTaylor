@@ -7,9 +7,11 @@
 # This code collects and scraps core data for the analysis
 # and puts it in xts format
 
-if (singular___flag = 1){
-  source('functs.R')
+if (flag___singular == 1){
+  
   cat('Single file execution')
+  source('directories.R')
+  source('functs.R')
 }
 
 
@@ -330,6 +332,8 @@ names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 
 # automatize download of the xlsx file, import, run statistics and merge
 
+
+
 #### codes for next series: 
 
 
@@ -371,5 +375,6 @@ tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
 data_dir, base, m1, m2, money, money_g, gdp, surplus,
 inizio, fine, surplus.ts, decomposed_surplus, debt_fed,
-debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal
+debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
+surplus_gdp, surplus_season
 )
