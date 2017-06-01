@@ -9,7 +9,7 @@
 
 #### Flagging
 
-singular___flag = 1
+flag___singular = 1
 # 0 -- the code runs entirely, all different parts
 # 1 -- when files are run singularily
 
@@ -17,13 +17,7 @@ singular___flag = 1
 source('functs.R', verbose=F, echo=F)
 
 #### Directories
-working_directory <- getwd()
-temp_dir <- 'Downloaded files'
-data_dir <- 'Processed data'
-graphs_dir <- 'Plots'
-dir.create(file.path(working_directory, temp_dir))
-dir.create(file.path(working_directory, data_dir))
-dir.create(file.path(working_directory, graphs_dir))
+source('directories.R', verbose=F, echo=F)
 
 #### DATA COLLECTION, SCRAPING, MANIPULATION ####
 
@@ -49,4 +43,4 @@ source('inflation_analysis.R')
 
 # housekeeping
 rm(temp_dir, data_dir, graphs_dir, 
-   working_directory)
+   working_directory, flag___singular)
