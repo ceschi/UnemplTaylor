@@ -116,7 +116,7 @@ variables <- merge(db_US$realtime_gap,          # realtime output gap
 VAR_spread <- VAR(varia['1967-01/2011-12'],     # period subsample, to exclude NAs
                   lag.max=8,                    # max lags to select
                   type='const',                 # VAR includes a vector for intercepts
-                  ic='AIC')                     # selection criterion for optimal lags
+                  ic='HQ')                      # selection criterion for optimal lags; HQ SC
 
 
 summary(VAR_spread)                             # prints estimates
