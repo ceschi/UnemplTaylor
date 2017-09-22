@@ -328,14 +328,32 @@ money_g <- diff(log(money))*100
 names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 
 
-#### SPF DATA
+#### SPF DATA ####
 
 # automatize download of the xlsx file, import, run statistics and merge
 
+# download CPI inflation rate raw file for individuals in the SPF
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/
+              real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
+              file.path(working_directory,temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb')
+
+# download CORE CPI inflation rate raw file for individuals in the SPF
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/
+              real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
+              file.path(working_directory,temp_dir,'spf_ind_corepci_rate.xlsx'), mode='wb')
+
+# download PCE inflation rate raw file for individuals in the SPF
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/
+              real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
+              file.path(working_directory,temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb')
+
+# download CORE PCE inflation rate file for individuals in the SPF
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/
+              real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
+              file.path(working_directory,temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
 
 
-#### codes for next series: 
-
+# read in xlsx files, date, tidy them
 
 
 #### Merge to dataset ####
@@ -373,8 +391,8 @@ cols, gdp_waves, rates, ffrate, unemployment, gap_output,
 spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
-data_dir, base, m1, m2, money, money_g, gdp, surplus,
-inizio, fine, surplus.ts, decomposed_surplus, debt_fed,
+data_dir, base, m1, m2, money, money_g, gdp,
+inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season
 )
