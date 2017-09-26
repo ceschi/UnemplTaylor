@@ -340,7 +340,7 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/
 # download CORE CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
-              file.path(working_directory,temp_dir,'spf_ind_corepci_rate.xlsx'), mode='wb')
+              file.path(working_directory,temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb')
 
 # download PCE inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
@@ -353,12 +353,48 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               file.path(working_directory,temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
 
 
-# read in xlsx files, date, tidy them
+# read in xlsx files and reshape w\ spread
+# this block selects only one quarter ahead forecasts
+spf_cpi <- read_excel(file.path(working_directory,temp_dir,'spf_ind_cpi_rate.xlsx'), 
+                      na='#N/A', col_types=c(rep('numeric', 3), rep('skip', 3), 'numeric', rep('skip', 6))) %>% 
+                      spread(ID, CPI3)
+names(spf_cpi) <- c('year', 'quarter', paste('cpi_h1', (1:(ncol(spf_cpi)-2)), sep='_'))
+
+
+spf_corecpi <- read_excel(file.path(working_directory,temp_dir,'spf_ind_corecpi_rate.xlsx'),
+                           na='#N/A', col_types=c(rep('numeric', 3), rep('skip', 3), 'numeric', rep('skip', 6))) %>%
+                           spread(ID, CORECPI3)
+names(spf_corecpi) <- c('year', 'quarter', paste('corecpi_h1', (1:(ncol(spf_corecpi)-2)), sep='_'))
+
+
+spf_pce <- read_excel(file.path(working_directory,temp_dir,'spf_ind_pce_rate.xlsx'),
+                           na='#N/A', col_types=c(rep('numeric', 3), rep('skip', 3), 'numeric', rep('skip', 6))) %>% 
+                           spread(ID, PCE3)
+names(spf_pce) <- c('year', 'quarter', paste('pce_h1', (1:(ncol(spf_pce)-2)), sep='_'))
+
+
+spf_corepce <- read_excel(file.path(working_directory,temp_dir,'spf_ind_corepce_rate.xlsx'),
+                           na='#N/A', col_types=c(rep('numeric', 3), rep('skip', 3), 'numeric', rep('skip', 6))) %>% 
+                           spread(ID, COREPCE3)
+names(spf_corepce) <- c('year', 'quarter', paste('corepce_h1', (1:(ncol(spf_corepce)-2)), sep='_'))
+
+# Merging and converting in XTS format
+spf <- Reduce(full_join, list(spf_cpi, spf_corecpi, spf_pce, spf_corepce)) %>% 
+  ts(start=c(1968, 4), frequency=4) %>% as.xts()
+spf$year <- spf$quarter <- NULL
+
+
+
+
+
+
+
+
 
 
 #### Merge to dataset ####
 
-db_US <- merge(rates, unemployment, gap_output, spreads, money, fiscal)
+db_US <- merge(rates, unemployment, gap_output, spreads, money, fiscal, spf)
 write.table(db_US, file.path(getwd(), data_dir, 'US_data.txt'), sep=';', row.names=F)
 
 
@@ -394,5 +430,6 @@ actual, capacity, y_real_gap, gap_expost, rates.mean,
 data_dir, base, m1, m2, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
-surplus_gdp, surplus_season
+surplus_gdp, surplus_season, spf, spf_corecpi,
+spf_corepce, spf_cpi, spf_pce
 )
