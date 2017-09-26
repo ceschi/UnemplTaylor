@@ -10,7 +10,7 @@
 #### Flagging
 
 flag___singular = 1
-# 0 -- the code runs entirely, all different parts
+# 0 -- the code runs entirely, all different parts composed
 # 1 -- when files are run singularily
 
 #### Functions #####
