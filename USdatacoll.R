@@ -422,7 +422,7 @@ spf_funct <-  function(filnam, typs, ahead=1) {
 
 
 spf_cpi <- spf_funct('spf_ind_cpi_rate.xlsx', 'CPI')
-spf_corecpi <- spf_funct('spf_ind_corepci_rate.xlsx', 'CORECPI')
+spf_corecpi <- spf_funct('spf_ind_corecpi_rate.xlsx', 'CORECPI')
 spf_pce <- spf_funct('spf_ind_pce_rate.xlsx','PCE')
 spf_corepce <- spf_funct('spf_ind_corepce_rate.xlsx', 'COREPCE')
 

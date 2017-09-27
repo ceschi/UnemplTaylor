@@ -12,21 +12,49 @@ repara <- function(x, rho=4){
 # consider putting all elements in lists of homogeneous 
 # elements and then looping over these ones
 
-# Formulas for regressions
-tr_standard <-  ffr ~ deflt + realtime_gap + ffrb
-tr_layoff <- ffr  ~ deflt + layoffs + ffrb
-tr_spread <- ffr ~ deflt + realtime_gap + ffrb + spread_baa
-tr_treasury <- ffr ~ deflt + realtime_gap + ffrb + spread_sp_3m
-tr_layspread <- ffr ~ deflt + layoffs + ffrb + spread_sp_3m
-tr_laybaa <- ffr ~ deflt + layoffs + ffrb + spread_baa
+regressions <- list(
+  formula=list(),
+  messages=list(),
+  models=list(),
+  params=list(),
+  plot=list()
+)
 
+# Formulas for regressions, appended to first sublist
+regressions$formula <- list(
+    tr_standard =  ffr ~ deflt + realtime_gap + ffrb,
+    # standard TR
+    tr_layoff = ffr  ~ deflt + layoffs + ffrb,
+    # TR with layoffs
+    tr_spread = ffr ~ deflt + realtime_gap + ffrb + spread_baa,
+    tr_treasury = ffr ~ deflt + realtime_gap + ffrb + spread_sp_3m,
+    tr_layspread = ffr ~ deflt + layoffs + ffrb + spread_sp_3m,
+    tr_laybaa = ffr ~ deflt + layoffs + ffrb + spread_baa,
+    tr_spf_mean = ffr ~ spf_cpi_h1_mean + realtime_gap + ffrb,
+    tr_spf_uncert = ffr ~ deflt + realtime_gap + ffrb + spf_cpi_h1_iqr
+    )
 
+### Looping over different specifications
+
+for (m in 1:length(regressions$formula)){
+  
+  # fit a linear model
+  regressions$models[[m]] <- lm(data=db_US, regressions$formula[[m]])
+  
+  # rescale parameters
+  regressions$params[[m]] <- repara(regressions$models[[m]])
+  
+  # graphing residuals w/ ggplot2
+  
+}
 
 us_reg_1 <- lm(data=db_US, tr_standard)
 summary(us_reg_1)
 params_1 <- repara(us_reg_1)
 cat('\n Parameters for Taylor Rule regression:\n')
 print(params_1)
+
+p <- ggplot(as.data.frame(us_reg_1$residuals))+geom_line(aes(x= y=us_reg_1$residuals))
 
 ts.plot(us_reg_1$residuals)
 abline(h=0, col='red')
@@ -93,6 +121,15 @@ ts.plot(us_reg_6$residuals)
 abline(h=0, col='red')
 abline(h=2*sd(us_reg_6$residuals), col='blue')
 abline(h=-2*sd(us_reg_6$residuals), col='blue')
+
+
+
+us_reg_7 <- lm(data=db_US, tr_spf_mean)
+summary(us_reg_7)
+params_7
+
+
+
 
 cat('\n\n\n\n us_reg_1 is standard Taylor Rule regression\n',
     'us_reg_2 replaces realtime output gap with layoff rate\n',
