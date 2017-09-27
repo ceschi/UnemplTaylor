@@ -45,7 +45,8 @@ for (m in 1:length(regressions$formula)){
   regressions$params[[m]] <- repara(regressions$models[[m]])
   
   # graphing residuals w/ ggplot2
-  
+  res <- residuals(regressions$models[[m]])
+  res <- data.frame(date=)
 }
 
 us_reg_1 <- lm(data=db_US, tr_standard)
@@ -54,7 +55,10 @@ params_1 <- repara(us_reg_1)
 cat('\n Parameters for Taylor Rule regression:\n')
 print(params_1)
 
-p <- ggplot(as.data.frame(us_reg_1$residuals))+geom_line(aes(x= y=us_reg_1$residuals))
+df <- data.frame(date=names(res) %>% as.yearqtr('%Y Q%q'),
+                 res=res)
+
+p <- ggplot(df, aes(x=date, y=res))+geom_line()+scale_x_yearqtr('%YQ%q',20)
 
 ts.plot(us_reg_1$residuals)
 abline(h=0, col='red')
