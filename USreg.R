@@ -17,6 +17,13 @@ regressions <- list(
   messages=list(),
   models=list(),
   params=list(),
+  stab=list(
+    cusum=list(),
+    cusumplot=list(),
+    fstat=list(),
+    fstatpoints=list(),
+    fstatplot=list()
+  ),
   plot=list()
 )
 
@@ -84,9 +91,24 @@ for (m in 1:length(regressions$formula)){
     regressions$plot[[m]], 'pdf', 
     file.path(working_directory, graphs_dir),
     height=8, width=14.16, units='in')
+  
+  # stability checks on OLS
+  # CUSUM
+  regressions$stab$cusum[[m]] <- efp(formula=regressions$formula[[m]], data=as.data.frame(db_US), type='OLS-CUSUM')
+  regressions$stab$cusumplot[[m]] <- recordPlot(regressions$stab$cusum[[m]], alpha=.01, boundary=T)
+  
+  # FStat
+  regressions$stab$fstat[[m]] <- Fstats(regressions$formula[[m]], data=db_US)
+  regressions$stab$fstatpoints[[m]] <- 
+  regressions$stab$fstatplot[[]] <- 
+  
 }
 
 
+#### Rolling window regression ####
+
+
+#### Markov Switching models with K states ####
 
 
 
