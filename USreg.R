@@ -173,6 +173,26 @@ IRF_SVAR_spread <- irf(SVAR_spread)
 
 plot(IRF_SVAR_spread)
 
+#### Rolling window regression ####
+
+
+#### Markov Switching models with K states ####
+
+# code for rolling window OLS regressions on time series 
+
+
+# require(zoo)
+# rollapply(zoo(database),
+#          width=262,    # length of the window
+#          FUN = function(Z) # FUN to apply rolling
+#          { 
+#             t = lm(formula=y~x, data = as.data.frame(Z), na.rm=T); 
+#             return(t$coef) 
+#          },
+#          by.column=FALSE, align="right")
+
+
+
 
 # housekeeping
 # rm()
