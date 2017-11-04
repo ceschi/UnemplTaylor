@@ -3,6 +3,8 @@
 library(ggplot2)
 
 
+
+
 ## shorthand for the saving path
 pat <- file.path(working_directory, graphs_dir)
 
@@ -15,7 +17,10 @@ trvars_plot <- ggplot(db_US, aes(x=time(db_US)))+
   
 print(trvars_plot)
 
-ggsave(filename='trvars.png', path = pat, width=900/4, height = 448/4, units = 'mm')
+ggsave(filename='trvars.png',
+       path = pat, 
+       device='pdf',
+       height=8, width=14.6, units='in')
 
 
 #### PLOTS TO BE REPRODUCED AND STORED ######

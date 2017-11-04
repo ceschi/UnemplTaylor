@@ -19,10 +19,9 @@ regressions <- list(
   params=list(),
   stab=list(
     cusum=list(),
-    cusumplot=list(),
     fstat=list(),
     fstatpoints=list(),
-    fstatplot=list()
+    fstatcandidates=list()
   ),
   plot=list()
 )
@@ -88,31 +87,36 @@ for (m in 1:length(regressions$formula)){
     xlab(' ') + ylab('Residuals') + ggtitle(regressions$messages[[m]])
   
   ggsave(paste0(regressions$messages[[m]],'.pdf'),
-    regressions$plot[[m]], 'pdf', 
+    regressions$plot[[m]], 
+    device='pdf', 
     file.path(working_directory, graphs_dir),
     height=8, width=14.16, units='in')
   
   # stability checks on OLS
   # CUSUM
-  regressions$stab$cusum[[m]] <- efp(formula=regressions$formula[[m]], data=as.data.frame(db_US), type='OLS-CUSUM')
-  regressions$stab$cusumplot[[m]] <- recordPlot(regressions$stab$cusum[[m]], alpha=.01, boundary=T)
+  regressions$stab$cusum[[m]]<- efp(formula=regressions$formula[[m]], data=as.data.frame(db_US), type='OLS-CUSUM')
+  # modifies title
+  regressions[["stab"]][["cusum"]][[m]][["type.name"]] <- paste0(regressions$messages[[m]], ': OLS-based CUSUM test')
   
-  # FStat
-  regressions$stab$fstat[[m]] <- Fstats(regressions$formula[[m]], data=db_US)
-  regressions$stab$fstatpoints[[m]] <- 
-  regressions$stab$fstatplot[[]] <- 
+  # FStat - Chow test
+  regressions$stab$fstat[[m]] <- Fstats(formula=regressions$formula[[m]], data=as.data.frame(db_US))
+  # saves most likely date of structural break
+  regressions$stab$fstatpoints[[m]] <- regressions[["models"]][[m]][["model"]][regressions$stab$fstat[[m]]$breakpoint,] %>% 
+    row.names()
+  # extracts and saves dates of breaks detected
   
+  regressions$stab$fstatcandidates[[m]] <- breakpoints(regressions$formula[[m]],
+                                                       data=as.data.frame(db_US))
+  #which(summary(asd)$RSS[2,]==min(summary(asd)$RSS[2,]), arr.ind=T)
+   
 }
 
 
-<<<<<<< HEAD
 #### Rolling window regression ####
 
 
 #### Markov Switching models with K states ####
-=======
-# code for rolling window OLS regressions on time series 
->>>>>>> origin/master
+
 
 # require(zoo)
 # rollapply(zoo(database),

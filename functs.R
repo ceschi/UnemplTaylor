@@ -37,6 +37,50 @@ instant_pkgs <- function(pkgs) {
     message("\n ...Packages were already loaded!\n")
   }
 }
+regressions <- list(
+  formula=list(),
+  messages=list(),
+  models=list(),
+  params=list(),
+  stab=list(
+    cusum=list(),
+    cusumplot=list(),
+    fstat=list(),
+    fstatpoints=list(),
+    fstatplot=list()
+  ),
+  plot=list()
+)
+
+reg_call <- function(m){
+  # prints the name of the model
+  print(regressions$messages[[m]])
+  
+  # prints the estimated formula
+  print(regressions$formula[[m]])
+  
+  # prints converted parameters + SE
+  print(regressions$params[[m]])
+  
+  # plots the residuals + SE bands for stability
+  print(regressions$plot[[m]])
+  
+  # plots cusum stability diagnostics
+  plot(regressions$stab$cusum[[m]], alpha=.01, boundary=T)
+  
+  # plots Fstat stability diagnostics
+  plot(regressions$stab$fstat[[m]])
+  title(main=paste0(regressions$messages[[m]], ': F-stat stability'),
+        sub=paste0('Vertical line indicates date of most likely break: ', 
+                   regressions$stab$fstatpoints[[m]]))
+  lines(breakpoints(regressions$stab$fstat[[m]]))
+  
+  # prints date of most likely break
+  print(regressions$stab$fstatpoints[[m]])
+  
+  
+  
+}
 
 
 repara <- function(x, rho=4){
