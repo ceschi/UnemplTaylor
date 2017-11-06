@@ -37,20 +37,7 @@ instant_pkgs <- function(pkgs) {
     message("\n ...Packages were already loaded!\n")
   }
 }
-regressions <- list(
-  formula=list(),
-  messages=list(),
-  models=list(),
-  params=list(),
-  stab=list(
-    cusum=list(),
-    cusumplot=list(),
-    fstat=list(),
-    fstatpoints=list(),
-    fstatplot=list()
-  ),
-  plot=list()
-)
+
 
 reg_call <- function(m){
   # prints the name of the model
@@ -194,19 +181,17 @@ formula.maker <- function(df, y){
 
 
 
-
-
-
 ##### Packages Loader #####
 
-pkgs <- c('vars', 'MSwM','tidyverse',
+pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
+          'quantreg', 'tidyverse',
           'tseries', 'dynlm', 'stargazer',
           'dyn', 'strucchange', 'xts',
-          'MASS', 'car', 'ggplot2',
+          'MASS', 'car',
           'mFilter', 'fredr', 'xlsx',
-          'dplyr', 'readr', 'quantmod',
+          'readr', 'quantmod',
           'devtools', 'lubridate',
-          'readxl')
+          'readxl', 'urca')
 # fill pkgs with names of the packages to install
 
 instant_pkgs(pkgs)

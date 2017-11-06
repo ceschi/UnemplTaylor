@@ -2,11 +2,13 @@
 
 
 #### Functions ####
-repara <- function(x, rho=4){
-  params <- coef(summary(x))[,1:2]/(1-coef(x)[rho])
-  params[rho,] <- coef(summary(x))[rho, 1:2]
-  return(params)
+if (flag___singular == 1){
+  
+  cat('Single file execution')
+  source('directories.R')
+  source('functs.R')
 }
+
 
 
 # consider putting all elements in lists of homogeneous 
@@ -112,7 +114,10 @@ for (m in 1:length(regressions$formula)){
 }
 
 
-#### Rolling window regression ####
+#### Rolling window regression on inflation ####
+
+
+
 
 
 #### Markov Switching models with K states ####

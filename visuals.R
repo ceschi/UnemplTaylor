@@ -271,5 +271,21 @@ ggsave(filename='trvars.png',
 # print(plot_shffr)
 
 
+##### inflation dynamics #####
+# plot_pi <- ggplot(na.omit(us_pi))+
+#   geom_line(aes(x=index(na.omit(us_pi)), y=deflt, color='t=0'), na.rm = T)+
+#   geom_line(aes(x=index(na.omit(us_pi)), y=deflt1, color='t=1'), na.rm = T)+
+#   ylab(' ')+xlab(' ')+theme(legend.position='top', legend.title = NULL)+
+#   theme_bw()+ggtitle('Nowcast and 1Q ahead forecast')
+# print(plot_pi)
+# 
+# 
+# plot_hist <- ggplot(data=us_pi)+geom_density(aes(x=deflt, fill='now'), alpha= .5)+  labs(' ')+
+#   geom_density(aes(x=deflt1, fill='1 ahead'), alpha=.5)+theme_bw()+
+#   scale_fill_manual( values = c("red","blue"), labels = c('t=0', 't=1'), name=' ')+ xlab('Inflation rates')+
+#   ggtitle('Distribution of the inflation rates')
+# print(plot_hist)
+
+
 ### housekeeping
 # rm(pat, ) 

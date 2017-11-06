@@ -37,7 +37,7 @@ ffrb <- lag(ffr)
 
 ffrate <- merge(ffr, ffrb)
 
-#### INFLATION FORECASTS ####
+#### INFLATION FORECASTS & REVISED ####
 
 # downloads the big xlsx Greenbook file in
 # a specifically created folder
@@ -108,6 +108,45 @@ defl.mean <- as.xts(ts(defl.mean, start=c(1967, 1), frequency = 4))
 defl.mean$date <- NULL
 
 rates.mean <- merge(ffrate, cpi.mean, core.mean, defl.mean)
+
+# Section to get historical, revised inflation TS
+
+rev_hist <- merge(
+
+          # Consumer Price Index for All Urban Consumers: All Items 
+          rev_pci = as.xts(fredr_series(series_id='CPIAUCSL', 
+                                          frequency='q', 
+                                        aggregation_method='eop', 
+                                        units='pc1')), 
+          
+          # Consumer Price Index for All Urban Consumers: All Items Less Food and Energy
+          rev_pci_fe  = as.xts(fredr_series(series_id='CPILFESL', 
+                                            frequency='q', 
+                                            aggregation_method='eop', 
+                                            units='pc1')),
+          
+          # Gross Domestic Product: Implicit Price Deflator
+          rev_defl = as.xts(fredr_series(series_id='GDPDEF', 
+                                          frequency='q', 
+                                         aggregation_method='eop', 
+                                         units='pc1')),
+          
+          # Personal Consumption Expenditures Excluding Food and Energy
+          rev_pce  = as.xts(fredr_series(series_id='PCE', 
+                                             frequency='q', 
+                                         aggregation_method='eop', 
+                                         units='pc1')),
+          
+          # Personal Consumption Expenditures Excluding Food and Energy
+          rev_pce_fe  = as.xts(fredr_series(series_id='PCEPILFE', 
+                                            frequency='q', 
+                                            aggregation_method='eop', 
+                                            units='pc1'))
+) 
+# renames variables
+names(rev_hist) <-  c('rev_pci', 'rev_pci_fe', 'rev_defl',
+                      'rev_pce', 'rev_pce_fe')
+
 
 #### ERROR GENERATING CODE #### 
 ### commented out bcs it does not merge
@@ -210,7 +249,7 @@ names(gap_output) <- c('realtime_gap', 'expost_gap')
 ##### SPREADS ####
 
 ## BAA 10Y bonds        !!! - DISCONTINUED BY FRED - !!!
-spread_baa <- as.xts(fredr_series(series_id='BAA10Y', frequency='q', aggregation_method=''))
+spread_baa <- as.xts(fredr_series(series_id='BAA10Y', frequency='q'))
 
 ## 3 months Tbill rate
 tbill_rate_3m <- as.xts(fredr_series(series_id='TB3MS',frequency='q'))
@@ -432,7 +471,7 @@ spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 
 #### Merge to dataset ####
 
-db_US <- merge(rates, unemployment, gap_output, spreads, money, fiscal, spf)
+db_US <- merge(rates, rev_hist, unemployment, gap_output, spreads, money, fiscal, spf)
 write.table(db_US, file.path(getwd(), data_dir, 'US_data.txt'), sep=';', row.names=F)
 
 
@@ -469,5 +508,5 @@ data_dir, base, m1, m2, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
-spf_corepce, spf_cpi, spf_pce
+spf_corepce, spf_cpi, spf_pce, rev_hist
 )
