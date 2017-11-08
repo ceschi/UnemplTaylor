@@ -144,7 +144,7 @@ rev_hist <- merge(
                                             units='pc1'))
 ) 
 # renames variables
-names(rev_hist) <-  c('rev_pci', 'rev_pci_fe', 'rev_defl',
+names(rev_hist) <-  c('rev_cpi', 'rev_cpi_fe', 'rev_defl',
                       'rev_pce', 'rev_pce_fe')
 
 

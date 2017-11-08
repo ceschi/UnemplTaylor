@@ -9,7 +9,7 @@
 
 #### Flagging
 
-flag___singular = 1
+flag___singular = 0
 # 0 -- the code runs entirely, all different parts composed
 # 1 -- when files are run singularily
 
@@ -27,15 +27,15 @@ source("USdatacoll.R", verbose=F, echo=F)
 source('visuals.R', verbose=F, echo=F)
 
 
-#### REGRESSIONS - SIMPLE ONES ####
+#### REGRESSIONS - TR bulk ####
 
 # US Data
 source('USreg.R', verbose=F, echo=F)
 
 
-#### REGRESSIONS - MORE SOPHISTICATED ####
+#### REGRESSIONS - inflation study  ####
 
-source('inflation_analysis.R')
+source('inflanalysis.R')
 
 
 
