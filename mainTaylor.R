@@ -20,12 +20,10 @@ source('functs.R', verbose=F, echo=F)
 source('directories.R', verbose=F, echo=F)
 
 #### DATA COLLECTION, SCRAPING, MANIPULATION ####
-
 source("USdatacoll.R", verbose=F, echo=F)
 
 
 ##### VISUALIZATION ####
-
 source('visuals.R', verbose=F, echo=F)
 
 

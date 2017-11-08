@@ -235,8 +235,11 @@ gdp_waves <- read.xlsx2(file.path(working_directory,temp_dir,'PhilFed_realtime_r
                         sheetName='ROUTPUT')
 cols <- ncol(gdp_waves)
 
+options(warn=-1) # line below produces more than 50 warnings as it produces NAs, which I want
 gdp_waves$DATE <- as.character(gdp_waves$DATE)
 gdp_waves[, 2:ncol(gdp_waves)] <- lapply(gdp_waves[, 2:ncol(gdp_waves)], function(x) as.numeric(levels(x))[x])
+options(warn=0) # reactivates warnings
+
 
 y_real_gap <- as.xts(ts(trendev(gdp_waves), start=c(1965, 4), frequency = 4))
 
@@ -279,6 +282,7 @@ tbill_rate_10y <- as.xts(fredr_series(series_id='DGS10',frequency='q'))
 #                      `Adj Close` = col_double()
 #                    ))
 
+options("getSymbols.warning4.0"=FALSE) # disables disclaimer about version update
 # downloads daily prices time series through new Yahoo! API
 # to be fixed sooner than later
 sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',
@@ -305,7 +309,7 @@ spread_sp_3m <- sp_ret - tbill_rate_3m
 spreads <- merge(spread_baa, spread_sp_3m)
 names(spreads) <- c('spread_baa', 'spread_sp_3m')
 
-
+options("getSymbols.warning4.0"=T) # activates disclaimer v0.4
 
 #### Additional variables #####
 
