@@ -396,73 +396,6 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               file.path(working_directory,temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
 
 
-# read in xlsx files and reshape w\ spread
-# this block selects one quarter ahead forecasts
-# but adjusting 'ahead' parameter below one can
-# extract other values
-
-# ad-hoc function inconsistent w/ external use
-spf_funct <-  function(filnam, typs, ahead=1) {
-  # this function imports the files, reformats,
-  # renames, saves in raw format and produces
-  # aggregate statistics in XTS format
-  
-  
-  # typ is one of CPI, CORECPI, PCE, COREPCE
-  
-  
-  # 'ahead' allows to select the horizon of 
-  # forecasts one wishes to extract:
-  # -1 for previous quarter estimates
-  # 0 for nowcast
-  # 1 for one quarter ahead -- default
-  # 2 for two quarters ahead
-  # 3 for three quarters ahead
-  # 4 for one year ahead
-  
-  typ=tolower(typs)
-  
-  colu=c(rep('numeric',3),  # picks year, quarter, ID
-         rep('skip', 2+ahead),	 # skips industry
-         'numeric',				 # moving target picking 'ahead' horizon
-         rep('skip', 7-ahead)	 # skips the rest
-  )
-  
-  df=read_excel(file.path(working_directory,temp_dir,filnam), 
-                na='#N/A', col_types=colu) %>%
-    spread(ID, paste0(typs,ahead+2)) %>% 
-    ts(start=c(1968, 4), frequency=4) %>%
-    as.xts()
-  
-  pst=paste0(typ,'_')
-  if (ahead==-1){
-    pst=paste0(pst,'b1')
-  } 	else {
-    pst=paste0(pst,'h') %>% paste0(ahead)
-  }
-  
-  names(df)=c('year', 'quarter', paste(pst, (1:(ncol(df)-2)), sep='_'))
-  
-  df$year <- df$quarter <- NULL
-  
-  # saving in txt csv format the raw data
-  write.table(df, file.path(getwd(), data_dir, paste(paste0('SPF_IND_',pst),'txt', sep='.')), sep=';', row.names=F)
-  
-  
-  iqr <- apply(df, 1, IQR, na.rm=TRUE) %>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
-  stand<-apply(df, 1, var, na.rm=T) %>% sqrt()%>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
-  mean<-apply(df, 1, mean, na.rm=T)%>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
-  mean[is.nan(mean)] <- NA
-  
-  lab <- paste0('spf_', pst)
-  
-  df_stat=merge(iqr, stand, mean)
-  names(df_stat)=paste(lab, c('iqr', 'sd', 'mean'), sep='_')
-              
-              
-  return(df_stat)
-}
-
 
 spf_cpi <- spf_funct('spf_ind_cpi_rate.xlsx', 'CPI')
 spf_corecpi <- spf_funct('spf_ind_corecpi_rate.xlsx', 'CORECPI')
@@ -476,7 +409,9 @@ spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 #### Merge to dataset ####
 
 db_US <- merge(rates, rev_hist, unemployment, gap_output, spreads, money, fiscal, spf)
-write.table(db_US, file.path(getwd(), data_dir, 'US_data.txt'), sep=';', row.names=F)
+write.zoo(x=db_US, 
+          file=file.path(getwd(), data_dir, 'US_data.txt'), 
+          sep=';', row.names=F, index.name='time')
 
 
 

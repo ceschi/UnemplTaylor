@@ -9,9 +9,14 @@
 
 #### Flagging
 
-flag___singular = 0
 # 0 -- the code runs entirely, all different parts composed
 # 1 -- when files are run singularily
+flag___singular = 0
+
+# 0 -- the code prints out all graphs
+# 1 -- graphs are not printed but only produced and stocked
+flag___plot = 1
+
 
 #### Functions #####
 source('functs.R', verbose=F, echo=F)
@@ -23,10 +28,6 @@ source('directories.R', verbose=F, echo=F)
 source("USdatacoll.R", verbose=F, echo=F)
 
 
-##### VISUALIZATION ####
-source('visuals.R', verbose=F, echo=F)
-
-
 #### REGRESSIONS - TR bulk ####
 
 # US Data
@@ -36,6 +37,10 @@ source('USreg.R', verbose=F, echo=F)
 #### REGRESSIONS - inflation study  ####
 
 source('inflanalysis.R')
+
+
+##### VISUALIZATION ####
+source('visuals.R', verbose=F, echo=F)
 
 
 

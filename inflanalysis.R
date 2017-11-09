@@ -38,10 +38,10 @@ inflation <- list(
              'Core nowcast',
              'GDP deflator nowcast',
              'Revised CPI',
-             'Revised CPI, w/o FE',
+             'Revised CPI, no FE',
              'Revised GDP deflator',
              'Revised PCE',
-             'Revised PCE, w/o FE'),
+             'Revised PCE, no FE'),
   unitroot=list(),
   ark=list(),
   aropti=list(),
@@ -129,7 +129,7 @@ for (i in 1:n){
     geom_smooth(method='loess', colour='blue')+scale_x_yearqtr(format='%Y Q%q', n=20)+theme_bw()+
     scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) + ggtitle(inflation$names[[i]])
   
-  # plot(inflation[['plot_rollm']][[i]])
+  if  (flag___plot==0) plot(inflation[['plot_rollm']][[i]])
   
   # saves graphs in proper directory with names
   ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]], '.pdf'),
@@ -152,3 +152,9 @@ for (i in 1:n){
 
 ##### Housekeeping ####
 rm(pi, n, i, r, k)
+
+
+
+
+
+

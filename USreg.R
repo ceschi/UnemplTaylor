@@ -106,7 +106,6 @@ for (m in 1:length(regressions$formula)){
   regressions$stab$fstatpoints[[m]] <- regressions[["models"]][[m]][["model"]][regressions$stab$fstat[[m]]$breakpoint,] %>% 
     row.names()
   # extracts and saves dates of breaks detected
-  
   regressions$stab$fstatcandidates[[m]] <- breakpoints(regressions$formula[[m]],
                                                        data=as.data.frame(db_US))
   #which(summary(asd)$RSS[2,]==min(summary(asd)$RSS[2,]), arr.ind=T)
@@ -116,7 +115,7 @@ for (m in 1:length(regressions$formula)){
 
 #### Rolling window regression on inflation ####
 
-
+source('inflanalysis.r')
 
 
 
