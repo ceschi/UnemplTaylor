@@ -2,7 +2,9 @@
 
 library(ggplot2)
 
-
+######################################################
+##########  SUBSET DB SO TO GET NICER GRAPHS  ########
+######################################################
 
 
 ## shorthand for the saving path
@@ -10,8 +12,9 @@ pat <- file.path(working_directory, graphs_dir)
 
 ##### Plots of general variables #####
 
+
 # TR variables
-plot_trvars <- ggplot(db_US, aes(x=time(db_US)))+
+plot_trvars <- ggplot(db_US, aes(x=index(db_US)))+
   geom_line(aes(y=ffr, color='FFR'), size=1)+
   geom_line(aes(y=rev_defl, color='Act. Infl.'), size=1)+
   geom_line(aes(y=deflt1, color='Exp. Infl.'), size=1)+
@@ -181,6 +184,23 @@ ggsave(plot = plot_spread,
        height=8, width=14.6, units='in')
 
 
+
+##### Residuals and results from regressions in USreg.r #####
+## of course, source the script beforehand
+
+if (flag___singular==1) source('USreg.r')
+
+# outputs all results in regressions list
+
+for (i in 1:length(regressions$models)){
+  # costum function, prints and plots
+  # results gathered in regression list
+  reg_call(i)
+}
+
+
+
+
 ##### Plots collector #####
 plots <- list(plot_trvars,
               plot_re_infl,
@@ -201,7 +221,8 @@ rm(plot_trvars,
    plot_spf_fore,
    plot_money,
    plot_spf_iqr,
-   plot_spread)
+   plot_spread,i,
+   )
 
 
 #### PLOTS TO BE REPRODUCED AND STORED ######

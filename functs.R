@@ -39,6 +39,7 @@ instant_pkgs <- function(pkgs) {
 }
 
 
+
 reg_call <- function(m){
   # custom function to extract, print and plot 
   # information on estimates of a particular
@@ -62,21 +63,42 @@ reg_call <- function(m){
   # # 8
   # 'TR augmented with IQR SPF'
   
+  # sink fnct saves in a txt file
+  # the output while printing it out
+  # on the command line
+  
+  sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regression results.txt'),
+       append=F,
+       split=T)
+  
+  sa_plot <- function(po){
+    # custum function to duplicate, save as pdf 
+    # and shut second graphic device
+    dev.copy(pdf, po, height=8, width=14.6)
+    invisible(dev.off())
+  }
+  
   
   # prints the name of the model
-  print(regressions$messages[[m]])
+  cat(paste0('\n\n\n\n\n\n\n', as.character(regressions$messages[[m]]), '\n'))
   
   # prints the estimated formula
+  cat('\n')
   print(regressions$formula[[m]])
+  cat('\n')
+  
+  # prints the number of observations used in the model
+  cat(paste0('\nModel estimated with ', nobs(regressions$models[[m]]), ' observations\n\n'))
   
   # prints converted parameters + SE
   print(regressions$params[[m]])
-  
+
   # plots the residuals + SE bands for stability
   print(regressions$plot[[m]])
-  
+
   # plots cusum stability diagnostics
   plot(regressions$stab$cusum[[m]], alpha=.01, boundary=T)
+  sa_plot(paste0(file.path(graphs_dir, regressions$messages[[m]]), ' CUSUM.pdf'))
   
   # plots Fstat stability diagnostics
   plot(regressions$stab$fstat[[m]])
@@ -84,13 +106,16 @@ reg_call <- function(m){
         sub=paste0('Vertical line indicates date of most likely break: ', 
                    regressions$stab$fstatpoints[[m]]))
   lines(breakpoints(regressions$stab$fstat[[m]]))
+  sa_plot(paste0(file.path(graphs_dir, regressions$messages[[m]]), ' F-stat.pdf'))
   
   # prints date of most likely break
-  print(regressions$stab$fstatpoints[[m]])
-  
+  cat(paste0('\nMost likely singular break occurs at ',
+             as.character(regressions$stab$fstatpoints[[m]]), '\n'))
+  sink()
   ##################################################
   ############# !!! WORK IN PROGRESS !!! ###########
   ##################################################
+
 }
 
 rollm <- function(df, formula){

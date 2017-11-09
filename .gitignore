@@ -2,7 +2,12 @@
 .Rhistory
 .Rapp.history
 /*.xlsx
+/*.xls
 /*.txt
+*.xlsx
+*.xls
+*.txt
+
 # Session Data files
 .RData
 
