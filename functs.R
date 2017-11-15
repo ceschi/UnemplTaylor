@@ -321,7 +321,7 @@ spf_funct <-  function(filnam, typs, ahead=1) {
          rep('skip', 7-ahead)	 # skips the rest
   )
   
-  df=read_excel(file.path(working_directory,temp_dir,filnam), 
+  df=read_excel(file.path(temp_dir,filnam), 
                 na='#N/A', col_types=colu) %>%
     spread(ID, paste0(typs,ahead+2)) %>% 
     ts(start=c(1968, 4), frequency=4) %>%
@@ -339,7 +339,7 @@ spf_funct <-  function(filnam, typs, ahead=1) {
   df$year <- df$quarter <- NULL
   
   # saving in txt csv format the raw data
-  write.zoo(df, file.path(getwd(), data_dir, paste(paste0('SPF_IND_',pst),'txt', sep='.')), sep=';', row.names=F, index.name='time')
+  write.zoo(df, file.path(data_dir, paste(paste0('SPF_IND_',pst),'txt', sep='.')), sep=';', row.names=F, index.name='time')
   
   
   iqr <- apply(df, 1, IQR, na.rm=TRUE) %>% ts(start=c(1968, 4), frequency=4) %>% as.xts()

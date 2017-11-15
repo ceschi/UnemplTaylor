@@ -102,7 +102,7 @@ for (i in 1:n){
 
 for (i in 1:n){
 
-  inflation[['rollm']][[i]] <- rolloop(df = pi[,i], window = 24, lags = k)
+  inflation[['rollm']][[i]] <- rolloop(df = pi[,i], window = 58, lags = k)
 
 }
 
@@ -135,7 +135,7 @@ for (i in 1:n){
   ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]], '.pdf'),
          inflation[['plot_rollm']][[i]],
          device='pdf',
-         file.path(working_directory, graphs_dir),
+         graphs_dir,
          height=8, width=14.16, units='in')
 }
 

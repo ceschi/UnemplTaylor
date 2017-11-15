@@ -16,12 +16,6 @@ if (flag___singular == 1){
 
 
 #### Scraping US data ####
-# #### Getting set up and creating folders ####
-# working_directory <- getwd()
-# temp_dir <- 'Downloaded files'
-# data_dir <- 'Processed data'
-# dir.create(file.path(working_directory, temp_dir))
-# dir.create(file.path(working_directory, data_dir))
 
 
 #### FEDERAL INTEREST RATE ####
@@ -42,18 +36,18 @@ ffrate <- merge(ffr, ffrb)
 # downloads the big xlsx Greenbook file in
 # a specifically created folder
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/greenbook-data/documentation/gbweb_row_format.xls?la=en',
-              file.path(working_directory,temp_dir,'Greenbook_allvar_row.xls'), mode='wb')
+              file.path(temp_dir,'Greenbook_allvar_row.xls'), mode='wb')
 
 # reads the single interesting sheets and
 # imports them in df format
 
 classi <- c('character', rep('numeric', 14), 'character')
 
-cpi_greenbook <- read.xlsx2(file.path(working_directory,temp_dir,'Greenbook_allvar_row.xls'), 
+cpi_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'), 
                             sheetName='gPCPI', colClasses=classi)
-core_greenbook <- read.xlsx2(file.path(working_directory,temp_dir,'Greenbook_allvar_row.xls'),
+core_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'),
                              sheetName='gPCPIX', colClasses=classi)
-deflator_greenbook <- read.xlsx2(file.path(working_directory,temp_dir,'Greenbook_allvar_row.xls'),
+deflator_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'),
                                  sheetName='gPGDP', colClasses=classi)
 
 # replace NAs
@@ -229,16 +223,16 @@ gap_expost <- (actual-capacity)*100/capacity
 # real time gap
 
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/real-time-data/data-files/files/xlsx/routputqvqd.xlsx?la=en',
-              file.path(working_directory,temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb')
+              file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb')
 
-gdp_waves <- read.xlsx2(file.path(working_directory,temp_dir,'PhilFed_realtime_realgdp.xlsx'), 
+gdp_waves <- read.xlsx2(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), 
                         sheetName='ROUTPUT')
 cols <- ncol(gdp_waves)
 
 options(warn=-1) # line below produces more than 50 warnings as it produces NAs, which I want
 gdp_waves$DATE <- as.character(gdp_waves$DATE)
 gdp_waves[, 2:ncol(gdp_waves)] <- lapply(gdp_waves[, 2:ncol(gdp_waves)], function(x) as.numeric(levels(x))[x])
-options(warn=0) # reactivates warnings
+
 
 
 y_real_gap <- as.xts(ts(trendev(gdp_waves), start=c(1965, 4), frequency = 4))
@@ -246,7 +240,7 @@ y_real_gap <- as.xts(ts(trendev(gdp_waves), start=c(1965, 4), frequency = 4))
 gap_output <- merge(y_real_gap, gap_expost)
 names(gap_output) <- c('realtime_gap', 'expost_gap')
                       # philly and st louis gaps, respectively
-
+options(warn=0) # reactivates warnings
 
 
 ##### SPREADS ####
@@ -378,22 +372,22 @@ names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 # download CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
-              file.path(working_directory,temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb')
+              file.path(temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb')
 
 # download CORE CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
-              file.path(working_directory,temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb')
+              file.path(temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb')
 
 # download PCE inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
-              file.path(working_directory,temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb')
+              file.path(temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb')
 
 # download CORE PCE inflation rate file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/
               real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
-              file.path(working_directory,temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
+              file.path(temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
 
 
 
@@ -410,7 +404,7 @@ spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 
 db_US <- merge(rates, rev_hist, unemployment, gap_output, spreads, money, fiscal, spf)
 write.zoo(x=db_US, 
-          file=file.path(getwd(), data_dir, 'US_data.txt'), 
+          file=file.path(data_dir, 'US_data.txt'), 
           sep=';', row.names=F, index.name='time')
 
 

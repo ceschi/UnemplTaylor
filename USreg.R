@@ -91,7 +91,7 @@ for (m in 1:length(regressions$formula)){
   ggsave(paste0(regressions$messages[[m]],'.pdf'),
     regressions$plot[[m]], 
     device='pdf', 
-    file.path(working_directory, graphs_dir),
+    graphs_dir,
     height=8, width=14.16, units='in')
   
   # stability checks on OLS
