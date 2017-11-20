@@ -126,6 +126,19 @@ reg_call <- function(m){
   cat(paste0('while optimal segmentation points to ', length(n_obs), ' breaks, at dates ', multibreaks))
   
   
+  # MSwM printig results and plotting
+  if (flag___msm!=0){
+    cat('\n\nMarkov Switching model estimation with', j, 'states')
+    cat('\n',summary(regressions$mswm$fit[[m]]))
+    cat('\n\nConverted parameters:\n', regressions$mswm$coefs[[m]])
+    par(mar=rep(1.8,4))
+    plotProb(regressions$mswm$fit[[m]], which=2)
+    title(outer=T, paste0(j, '-state MS regimes for ', regressions$messages[[m]]))
+    sa_plot(file.path(graphs_dir,paste0(regressions$messages[[m]], ' ',
+                      j,'-state MSM.pdf')))
+  }
+  
+  
   # stopping printing
   sink()
   ##################################################
@@ -511,7 +524,7 @@ pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
           'mFilter', 'fredr', 'xlsx',
           'readr', 'quantmod',
           'devtools', 'lubridate',
-          'readxl', 'urca')
+          'readxl')#, 'urca')
 # fill pkgs with names of the packages to install
 
 instant_pkgs(pkgs)

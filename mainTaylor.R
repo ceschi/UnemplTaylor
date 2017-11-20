@@ -17,6 +17,15 @@ flag___singular = 0
 # 1 -- graphs are not printed but only produced and stocked
 flag___plot = 1
 
+# 0 -- optimal lags for inflation are off
+# 1 -- optimal lags for inflation are on
+flag___optilag = 0
+
+# 0 -- MsM estimation is off
+# 1 -- MsM estimation is on, 2 states
+# 2 -- MsM estimation is on, 3 states
+flag___msm = 1
+
 
 #### Functions #####
 source('functs.R', verbose=F, echo=F)

@@ -25,7 +25,10 @@ regressions <- list(
     fstatpoints=list(),
     fstatcandidates=list()
   ),
-  mswm=list(),
+  mswm=list(
+    fit=list(),
+    coefs=list()
+  ),
   plot=list()
 )
 
@@ -121,20 +124,26 @@ source('inflanalysis.r')
 
 
 #### Markov Switching models with K states ####
+# looping over formulae to estimate j-state
+# Markov Switching model
+
+if (flag___msm==1) j <- 2
+if (flag___msm==2) j <- 3
+
+if (flag___msm!=0){
+for (m in 1:length(regressions$formula)){
+  regressions$mswm$fit[[m]] <- msmFit(object=regressions$models[[m]],
+                                  #data=db_US,
+                                  k=j,
+                                  sw=rep(T, length(regressions$formula[[m]])+3)
+                                  )
+  regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
+  
+}
+}
 
 
-# require(zoo)
-# rollapply(zoo(database),
-#          width=262,    # length of the window
-#          FUN = function(Z) # FUN to apply rolling
-#          { 
-#             t = lm(formula=y~x, data = as.data.frame(Z), na.rm=T); 
-#             return(t$coef) 
-#          },
-#          by.column=FALSE, align="right")
-
-
-
+stop('code here to be fixed and designed')
 ##### VAR #####
 # Model: y_t = A_i y_{t-1} + \eps_t
 

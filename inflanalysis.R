@@ -32,7 +32,11 @@ k=5
 # MUST be <k
 r=1
 
-# results collecter
+# select window width for
+# rolling estimates
+wind=58
+
+# results collector
 inflation <- list(
   names=list('CPI nowcast',
              'Core nowcast',
@@ -45,18 +49,28 @@ inflation <- list(
   unitroot=list(),
   ark=list(),
   aropti=list(),
+  aroptilm=list(),
+  plot_aropti=list(),
   rollm=list(),
   plot_rollm=list()
 )
 
 ##### Unit root tests #####
+if (flag___optilag==1){
+  llags <- 18
+} else if (flag___optilag==0){
+  llags <- 8
+}
 
 for (i in 1:n){
   inflation[['unitroot']][[i]] <- ur.df(na.omit(pi[,i]),
                                          # DF test, max lag to consider
-                                         lags=8,
+                                        lags=llags,
                                          # lags selection criterion, min BIC
                                          selectlags='BIC')
+  # storing optimal lags !!!! TO BETTER UNDERSTAND !!!!
+  
+  if (flag___optilag==1) inflation[['aropti']][[i]]<- inflation[['unitroot']][[i]]@optilags
   
   if (inflation[['unitroot']][[i]]@teststat>
       inflation[['unitroot']][[i]]@cval[3]) {
@@ -75,6 +89,7 @@ for (i in 1:n){
            inflation[['unitroot']][[i]]@cval[1]) {
               cat(paste0('For ', names(pi)[i], ' it is possible to reject \nthe null hypothesis of unit root at 99%.\n\n'))
   }
+  
 }
 
 ##### AR regression with fixed lags k=5 #####
@@ -89,12 +104,41 @@ for (i in 1:n){
   print(inflation[['ark']][[i]])
 }
 
+
 ##### AR regression with optimal lags #####
-
+if (flag___optilag==1){
 for (i in 1:n){
-  cat('\nget to know how to extract the optimal lag: in ur.df class there is a section @lags')
+  inflation[['aroptilm']][[i]] <- rolloop(df = pi[,i], window = wind, lags = inflation[['aropti']][[i]])
+  
+  inflation[['plot_aropti']][[i]] <- ggplot(data=inflation[['aroptilm']][[i]],
+                                            aes(x=index(inflation[['aroptilm']][[i]]),
+                                                y=inflation[['aroptilm']][[i]][,r]))+
+    # plot the above with line geom, in black
+    geom_line(colour='black', size=1)+
+    # adds upper confidence band in red
+    geom_line(aes(y=inflation[['aroptilm']][[i]][,r]+inflation[['aroptilm']][[i]][,inflation[['aropti']][[i]]+r]),
+              colour='red')+
+    # adds lower confidence band in red
+    geom_line(aes(y=inflation[['aroptilm']][[i]][,r]-inflation[['aroptilm']][[i]][,inflation[['aropti']][[i]]+r]),
+              colour='red')+
+    # adds unit root line
+    geom_line(aes(y=1), colour='black', size=.8)+
+    # plot makeup
+    geom_smooth(method='loess', colour='blue')+scale_x_yearqtr(format='%Y Q%q', n=20)+theme_bw()+
+    scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) + 
+    ggtitle(paste0(inflation$names[[i]],' - ', inflation[['aropti']][[i]], ' optimal lags'))
+  
+  if  (flag___plot==0) plot(inflation[['plot_aropti']][[i]])
+  
+  # saves graphs in proper directory with names
+  ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]], 
+                '- ', inflation[['aropti']][[i]], ' optimal lags.pdf'),
+         inflation[['plot_aropti']][[i]],
+         device='pdf',
+         graphs_dir,
+         height=8, width=14.16, units='in')
 }
-
+}
 
 ##### AR(k) rolling window regressions #####
 ## consider using map() or apply() function families
@@ -153,7 +197,7 @@ for (i in 1:n){
 
 
 ##### Housekeeping ####
-rm(pi, n, i, r, k)
+rm(pi, n, i, r, k, llags)
 
 
 
