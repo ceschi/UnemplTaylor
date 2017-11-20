@@ -85,6 +85,7 @@ for (i in 1:n){
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
                                                         names(.) %>% first())
                                 ) %>% summary() %>% coef()
+  cat('\n\n')
   print(inflation[['ark']][[i]])
 }
 
@@ -105,7 +106,8 @@ for (i in 1:n){
   inflation[['rollm']][[i]] <- rolloop(df = pi[,i], window = 58, lags = k)
 
 }
-
+## about window length: 58 is used by Pivetta&Reis as well as Fuhrer, trade off
+## is about precision and extension of the resulting estimates
 
 
 ##### Plots registration #####

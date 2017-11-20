@@ -1,14 +1,11 @@
 ############## Visualization for TR study ###############
 
-library(ggplot2)
+if (flag___singular==1) library(ggplot2)
 
 ######################################################
 ##########  SUBSET DB SO TO GET NICER GRAPHS  ########
 ######################################################
 
-
-## shorthand for the saving path
-pat <- file.path(working_directory, graphs_dir)
 
 ##### Plots of general variables #####
 
@@ -28,7 +25,7 @@ if (flag___plot==0) print(plot_trvars)
 
 ggsave(plot_trvars,
        filename='TRvars.pdf',
-       path = pat, 
+       path = graphs_dir, 
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -48,7 +45,7 @@ if (flag___plot==0) print(plot_re_infl)
 
 ggsave(plot = plot_re_infl,
       filename='rev_infl.pdf',
-      path=pat,
+      path=graphs_dir,
       device='pdf',
       height=8, width=14.6, units='in')
 
@@ -69,7 +66,7 @@ if (flag___plot==0) print(plot_slack)
 
 ggsave(plot = plot_slack,
        filename='output slack.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -88,7 +85,7 @@ if (flag___plot==0) print(plot_nowinf)
 
 ggsave(plot = plot_nowinf,
        filename='inflation nowcast.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -106,7 +103,7 @@ if (flag___plot==0) print(plot_hinf)
 
 ggsave(plot = plot_hinf,
        filename='inflation forecasts.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -125,7 +122,7 @@ if (flag___plot==0) print(plot_spf_fore)
 
 ggsave(plot = plot_spf_fore,
        filename='SPF inf forecasts.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -144,7 +141,7 @@ if (flag___plot==0) print(plot_spf_iqr)
 
 ggsave(plot = plot_spf_iqr,
        filename='disagreement inf forecasts.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -162,7 +159,7 @@ if (flag___plot==0) print(plot_money)
 
 ggsave(plot = plot_money,
        filename='money.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -179,7 +176,7 @@ if (flag___plot==0) print(plot_spread)
 
 ggsave(plot = plot_spread,
        filename='spreads.pdf',
-       path=pat,
+       path=graphs_dir,
        device='pdf',
        height=8, width=14.6, units='in')
 
@@ -195,6 +192,7 @@ if (flag___singular==1) source('USreg.r')
 for (i in 1:length(regressions$models)){
   # costum function, prints and plots
   # results gathered in regression list
+  # and writes results in a txt file
   reg_call(i)
 }
 
@@ -221,7 +219,7 @@ rm(plot_trvars,
    plot_spf_fore,
    plot_money,
    plot_spf_iqr,
-   plot_spread,i,
+   plot_spread,i
    )
 
 

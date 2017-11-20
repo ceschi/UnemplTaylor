@@ -25,6 +25,7 @@ regressions <- list(
     fstatpoints=list(),
     fstatcandidates=list()
   ),
+  mswm=list(),
   plot=list()
 )
 
@@ -108,7 +109,7 @@ for (m in 1:length(regressions$formula)){
   # extracts and saves dates of breaks detected
   regressions$stab$fstatcandidates[[m]] <- breakpoints(regressions$formula[[m]],
                                                        data=as.data.frame(db_US))
-  #which(summary(asd)$RSS[2,]==min(summary(asd)$RSS[2,]), arr.ind=T)
+  
    
 }
 

@@ -111,6 +111,22 @@ reg_call <- function(m){
   # prints date of most likely break
   cat(paste0('\nMost likely singular break occurs at ',
              as.character(regressions$stab$fstatpoints[[m]]), '\n'))
+  regressions$stab$fstatcandidates[[m]]
+  
+  # optimal number of segment partition,
+  # -1 to account for the 0-breaks case
+  fstat_dates <- which(summary(regressions$stab$fstatcandidates[[m]])$RSS[2,]==
+                         min(summary(regressions$stab$fstatcandidates[[m]])$RSS[2,]), arr.ind=T)-1
+  
+  # extracting corresponding nobs and dates
+  n_obs <- summary(regressions$stab$fstatcandidates[[m]])$breakpoints[fstat_dates,] %>% na.omit(.)
+  multibreaks <- names(regressions$stab$fstatcandidates[[m]]$y)[n_obs] %>% paste(collapse=', ')
+  
+  # printing optimal segment partition dates
+  cat(paste0('while optimal segmentation points to ', length(n_obs), ' breaks, at dates ', multibreaks))
+  
+  
+  # stopping printing
   sink()
   ##################################################
   ############# !!! WORK IN PROGRESS !!! ###########
