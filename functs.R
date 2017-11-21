@@ -67,7 +67,7 @@ reg_call <- function(m){
   # the output while printing it out
   # on the command line
   
-  sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regression results.txt'),
+  sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regressions results.txt'),
        append=F,
        split=T)
   
@@ -130,13 +130,24 @@ reg_call <- function(m){
   if (flag___msm!=0){
     cat('\n\nMarkov Switching model estimation with', j, 'states')
     cat('\n',summary(regressions$mswm$fit[[m]]))
-    cat('\n\nConverted parameters:\n', regressions$mswm$coefs[[m]])
+    cat('\n\nConverted parameters:\n')
+    print(regressions$mswm$coefs[[m]])
     par(mar=rep(1.8,4))
     plotProb(regressions$mswm$fit[[m]], which=2)
-    title(outer=T, paste0(j, '-state MS regimes for ', regressions$messages[[m]]))
+    title(paste0(j, '-state MS regimes for ', regressions$messages[[m]]), line=9.5)
     sa_plot(file.path(graphs_dir,paste0(regressions$messages[[m]], ' ',
                       j,'-state MSM.pdf')))
   }
+  
+  # VAR results for TR equation
+  # this does ignore all other results
+  print(summary(regressions$var$varfit[[m]], equation='ffr'))
+  
+  # plots and saves IRFs
+  plot(regressions$var$varirf[[m]])
+  title(paste0(regressions$messages[[m]], ' VAR IRFs, MonPol shock'), line=10)
+  sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' VAR model IRFs.pdf')))
+      
   
   
   # stopping printing
@@ -517,28 +528,20 @@ spf_funct <-  function(filnam, typs, ahead=1) {
 ##### Packages Loader #####
 
 pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
-          'quantreg', 'tidyverse',
+          'quantreg', 'tidyverse', 'devtools',
           'tseries', 'dynlm', 'stargazer',
           'dyn', 'strucchange', 'xts',
           'MASS', 'car',
           'mFilter', 'fredr', 'xlsx',
           'readr', 'quantmod',
           'devtools', 'lubridate',
-          'readxl')#, 'urca')
+          'readxl', 'urcabis')
 # fill pkgs with names of the packages to install
 
-instant_pkgs(pkgs)
-
-## part needed for handling Yahoo! finance data,
-## supposed to change w/ next release of 'quantmod' pkg
-## requires installation of 'Rtools' to compile
-
-#           devtools::install_github("joshuaulrich/quantmod", ref="157_yahoo_502")
 devtools::install_github('sboysel/fredr')
-# devtools::install_github('ceschi/urca')
+devtools::install_github('ceschi/urcabis')
 
-library(quantmod)
-library(fredr)
+instant_pkgs(pkgs)
 
 
 rm(pkgs)

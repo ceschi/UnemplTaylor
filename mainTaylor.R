@@ -1,10 +1,5 @@
 #### Main file for Taylor rule second branch of rsch ####
-
-#### Second venue of research
-#### using unemployment metrics to proxy output gap ####
-
-# side goal: integrate smoothly this with previous codes
-# for US (Trulyfinal.R) and for the panel building
+#### using unemployment metrics to proxy output gap #####
 
 
 #### Flagging
@@ -19,7 +14,7 @@ flag___plot = 1
 
 # 0 -- optimal lags for inflation are off
 # 1 -- optimal lags for inflation are on
-flag___optilag = 0
+flag___optilag = 1
 
 # 0 -- MsM estimation is off
 # 1 -- MsM estimation is on, 2 states
@@ -43,9 +38,9 @@ source("USdatacoll.R", verbose=F, echo=F)
 source('USreg.R', verbose=F, echo=F)
 
 
-#### REGRESSIONS - inflation study  ####
+#### Analysis on inflation ####
 
-source('inflanalysis.R')
+source('inflanalysis.r')
 
 
 ##### VISUALIZATION ####
@@ -55,4 +50,5 @@ source('visuals.R', verbose=F, echo=F)
 
 # housekeeping
 rm(temp_dir, data_dir, graphs_dir, 
-   working_directory, flag___singular)
+   working_directory, flag___singular,
+   flag___msm, flag___optilag, flag___plot)

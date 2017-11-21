@@ -7,6 +7,7 @@ if (flag___singular == 1){
   cat('Single file execution')
   source('directories.R')
   source('functs.R')
+  source('USdatacoll.R')
 }
 
 
@@ -29,6 +30,11 @@ regressions <- list(
     fit=list(),
     coefs=list()
   ),
+  var=list(
+    varfit=list(),
+    varirf=list()
+  ),
+  svar=list(),
   plot=list()
 )
 
@@ -117,11 +123,6 @@ for (m in 1:length(regressions$formula)){
 }
 
 
-#### Rolling window regression on inflation ####
-
-source('inflanalysis.r')
-
-
 
 #### Markov Switching models with K states ####
 # looping over formulae to estimate j-state
@@ -135,7 +136,7 @@ for (m in 1:length(regressions$formula)){
   regressions$mswm$fit[[m]] <- msmFit(object=regressions$models[[m]],
                                   #data=db_US,
                                   k=j,
-                                  sw=rep(T, length(regressions$formula[[m]])+3)
+                                  sw=rep(T, 1+regressions$formula[[m]] %>% all.vars() %>% length())
                                   )
   regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
   
@@ -143,71 +144,82 @@ for (m in 1:length(regressions$formula)){
 }
 
 
-stop('code here to be fixed and designed')
+
 ##### VAR #####
 # Model: y_t = A_i y_{t-1} + \eps_t
 
-variables <- merge(db_US$realtime_gap,          # realtime output gap
-                   db_US$ffr,                   # federal fund rate
-                   db_US$deflt1,                # one period ahead GDP deflator forecast
-                   db_US$deflt,                 # current GDP deflator nowcast
-                   db_US$spread_sp_3m)          # SP500 v 3MTBill spread
 
-VAR_spread <- VAR(varia['1967-01/2011-12'],     # period subsample, to exclude NAs
-                  lag.max=8,                    # max lags to select
-                  type='const',                 # VAR includes a vector for intercepts
-                  ic='HQ')                      # selection criterion for optimal lags; HQ SC
-
-
-summary(VAR_spread)                             # prints estimates
-
-
-IRF_VAR_spread <- irf(VAR_spread)               # prints IRFs for VAR with spread
-
-#### SVAR ####
-# Model: Ay_t = A_i y_{t-1} + \eps_t
-
-# Declare A matrix 
-SVAR_Amat <- matrix(c(NA,NA,NA,0,0,
-                      NA,NA,NA,0,NA,
-                      0,NA,NA,0,0,
-                      NA,0,NA,NA,0,
-                      NA,NA,0,0,NA), 
-                    nrow=5, ncol=5, byrow=T)
-
-SVAR_Amat_alt <- matrix(c(NA,NA,NA,0,0,
-                          NA,NA,NA,0,NA,
-                          0,NA,NA,0,0,
-                          NA,0,NA,NA,0,
-                          0,0,NA,0,NA), 
-                        nrow=5, ncol=5, byrow=T) # alternative A matrix specification
-
-SVAR_spread <- SVAR(VAR_spread,
-                    Amat=SVAR_Amat,
-                    Bmat=NULL,
-                    estmethod='direct', hessian=T, method='CG')
-
-IRF_SVAR_spread <- irf(SVAR_spread)
-
-plot(IRF_SVAR_spread)
-
-#### Rolling window regression ####
+for (m in 1:length(regressions$formula)){
+  
+  # estimate a VAR model with pre-set formulas
+  regressions$var$varfit[[m]] <- VAR(y = db_US %>% as.tibble()  %>% 
+                                      select(regressions$formula[[m]] %>% all.vars(), -ffrb) %>%
+                                      na.omit(.),
+                                      lag.max = 16,
+                                      type = 'const',
+                                      ic = 'HQ')
+  # stock irfs for 40 quarters,
+  # the impulse is given to
+  # the interest rate  --> might consider inclusion of 
+  # actual cpi series to check how real inflation reacts
+  regressions$var$varirf[[m]] <- irf(regressions$var$varfit[[m]],
+                                     impulse='ffr',
+                                     n.ahead=20,
+                                     runs=500)
+  
+  # regressions$svar[[m]] <- SVAR()
+  
+  
+}
 
 
-#### Markov Switching models with K states ####
-
-# code for rolling window OLS regressions on time series 
 
 
-# require(zoo)
-# rollapply(zoo(database),
-#          width=262,    # length of the window
-#          FUN = function(Z) # FUN to apply rolling
-#          { 
-#             t = lm(formula=y~x, data = as.data.frame(Z), na.rm=T); 
-#             return(t$coef) 
-#          },
-#          by.column=FALSE, align="right")
+# stop('end of working code')
+# 
+# variables <- merge(db_US$realtime_gap,          # realtime output gap
+#                    db_US$ffr,                   # federal fund rate
+#                    db_US$deflt1,                # one period ahead GDP deflator forecast
+#                    db_US$deflt,                 # current GDP deflator nowcast
+#                    db_US$spread_sp_3m)          # SP500 v 3MTBill spread
+# 
+# VAR_spread <- VAR(varia['1967-01/2011-12'],     # period subsample, to exclude NAs
+#                   lag.max=8,                    # max lags to select
+#                   type='const',                 # VAR includes a vector for intercepts
+#                   ic='HQ')                      # selection criterion for optimal lags; HQ SC
+# 
+# 
+# summary(VAR_spread)                             # prints estimates
+# 
+# 
+# IRF_VAR_spread <- irf(VAR_spread)               # prints IRFs for VAR with spread
+# 
+# #### SVAR ####
+# # Model: Ay_t = A_i y_{t-1} + \eps_t
+# 
+# # Declare A matrix 
+# SVAR_Amat <- matrix(c(NA,NA,NA,0,0,
+#                       NA,NA,NA,0,NA,
+#                       0,NA,NA,0,0,
+#                       NA,0,NA,NA,0,
+#                       NA,NA,0,0,NA), 
+#                     nrow=5, ncol=5, byrow=T)
+# 
+# SVAR_Amat_alt <- matrix(c(NA,NA,NA,0,0,
+#                           NA,NA,NA,0,NA,
+#                           0,NA,NA,0,0,
+#                           NA,0,NA,NA,0,
+#                           0,0,NA,0,NA), 
+#                         nrow=5, ncol=5, byrow=T) # alternative A matrix specification
+# 
+# SVAR_spread <- SVAR(VAR_spread,
+#                     Amat=SVAR_Amat,
+#                     Bmat=NULL,
+#                     estmethod='direct', hessian=T, method='CG')
+# 
+# IRF_SVAR_spread <- irf(SVAR_spread)
+# 
+# plot(IRF_SVAR_spread)
 
 
 

@@ -1,6 +1,6 @@
 ############## Visualization for TR study ###############
 
-if (flag___singular==1) library(ggplot2)
+if (flag___singular==1) library(ggplot2, xts)
 
 ######################################################
 ##########  SUBSET DB SO TO GET NICER GRAPHS  ########
@@ -189,11 +189,11 @@ if (flag___singular==1) source('USreg.r')
 
 # outputs all results in regressions list
 
-for (i in 1:length(regressions$models)){
+for (m in 1:length(regressions$models)){
   # costum function, prints and plots
   # results gathered in regression list
   # and writes results in a txt file
-  reg_call(i)
+  reg_call(m)
 }
 
 
@@ -219,7 +219,7 @@ rm(plot_trvars,
    plot_spf_fore,
    plot_money,
    plot_spf_iqr,
-   plot_spread,i
+   plot_spread,m
    )
 
 
