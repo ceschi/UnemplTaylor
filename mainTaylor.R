@@ -35,10 +35,37 @@ source("USdatacoll.R", verbose=F, echo=F)
 #### REGRESSIONS - TR bulk ####
 
 # US Data
+# pick ahead to set how many quarters ahead 
+# to consider for SPF forecasts:
+# -1 for previous quarter estimates
+# 0 for nowcast
+# 1 for one quarter ahead -- default
+# 2 for two quarters ahead
+# 3 for three quarters ahead
+# 4 for one year ahead
+
+ahead <- 1
 source('USreg.R', verbose=F, echo=F)
 
 
+
+
 #### Analysis on inflation ####
+# AR(k) on several inflation series
+
+
+# exogenous lag
+k=5
+
+# selector for coefficient
+# AR(r) will be plotted
+# MUST be <k
+r=1
+
+# select window width for
+# rolling estimates, pick <80
+# to get interesting results
+wind=58
 
 source('inflanalysis.r')
 
@@ -51,4 +78,5 @@ source('visuals.R', verbose=F, echo=F)
 # housekeeping
 rm(temp_dir, data_dir, graphs_dir, 
    working_directory, flag___singular,
-   flag___msm, flag___optilag, flag___plot)
+   flag___msm, flag___optilag, flag___plot,
+   ahead, k, r, wind)

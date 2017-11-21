@@ -12,6 +12,9 @@ if (flag___singular == 1){
   cat('Single file execution')
   source('directories.R')
   source('functs.R')
+  
+  # selector for the lead in SPF
+  ahead <- 1
 }
 
 
@@ -391,10 +394,14 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/
 
 
 
-spf_cpi <- spf_funct('spf_ind_cpi_rate.xlsx', 'CPI')
-spf_corecpi <- spf_funct('spf_ind_corecpi_rate.xlsx', 'CORECPI')
-spf_pce <- spf_funct('spf_ind_pce_rate.xlsx','PCE')
-spf_corepce <- spf_funct('spf_ind_corepce_rate.xlsx', 'COREPCE')
+spf_cpi <- spf_funct('spf_ind_cpi_rate.xlsx', 'CPI',
+                     ahead=ahead)
+spf_corecpi <- spf_funct('spf_ind_corecpi_rate.xlsx', 'CORECPI',
+                         ahead=ahead)
+spf_pce <- spf_funct('spf_ind_pce_rate.xlsx','PCE',
+                     ahead=ahead)
+spf_corepce <- spf_funct('spf_ind_corepce_rate.xlsx', 'COREPCE',
+                         ahead=ahead)
 
 spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 
@@ -405,7 +412,9 @@ spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 db_US <- merge(rates, rev_hist, unemployment, gap_output, spreads, money, fiscal, spf)
 write.zoo(x=db_US, 
           file=file.path(data_dir, 'US_data.txt'), 
-          sep=';', row.names=F, index.name='time')
+          sep=';', 
+          row.names=F, 
+          index.name='time')
 
 
 
@@ -441,5 +450,6 @@ base, m1, m2, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
-spf_corepce, spf_cpi, spf_pce, rev_hist
+spf_corepce, spf_cpi, spf_pce, rev_hist, ahead
 )
+if (flag___singular == 1) rm(ahead)

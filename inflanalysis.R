@@ -9,6 +9,18 @@ if (flag___singular == 1){
   source('directories.R')
   source('functs.R')
   source('USdatacoll.R')
+  # exogenous lag
+  k=5
+  
+  # selector for coefficient
+  # AR(r) will be plotted
+  # MUST be <k
+  r=1
+  
+  # select window width for
+  # rolling estimates, pick <80
+  # to get interesting results
+  wind=58
 }
 
 ##### Subset columns to have inflations ####
@@ -24,17 +36,6 @@ pi <- merge(db_US$cpit,
 
 # looping upper bound
 n=length(names(pi))
-
-# exogenous lag
-k=5
-
-# selector for coefficient
-# MUST be <k
-r=1
-
-# select window width for
-# rolling estimates
-wind=58
 
 # results collector
 inflation <- list(
@@ -147,7 +148,7 @@ for (i in 1:n){
 
 for (i in 1:n){
 
-  inflation[['rollm']][[i]] <- rolloop(df = pi[,i], window = 58, lags = k)
+  inflation[['rollm']][[i]] <- rolloop(df = pi[,i], window = wind, lags = k)
 
 }
 ## about window length: 58 is used by Pivetta&Reis as well as Fuhrer, trade off
@@ -197,7 +198,10 @@ for (i in 1:n){
 
 
 ##### Housekeeping ####
-rm(pi, n, i, r, k, llags)
+rm(pi, n, i, llags)
+
+if (flag___singular == 1) rm(r, k, wind)
+
 
 
 
