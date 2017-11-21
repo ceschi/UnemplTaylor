@@ -29,11 +29,6 @@ source('functs.R', verbose=F, echo=F)
 source('directories.R', verbose=F, echo=F)
 
 #### DATA COLLECTION, SCRAPING, MANIPULATION ####
-source("USdatacoll.R", verbose=F, echo=F)
-
-
-#### REGRESSIONS - TR bulk ####
-
 # US Data
 # pick ahead to set how many quarters ahead 
 # to consider for SPF forecasts:
@@ -45,6 +40,11 @@ source("USdatacoll.R", verbose=F, echo=F)
 # 4 for one year ahead
 
 ahead <- 1
+source("USdatacoll.R", verbose=F, echo=F)
+
+
+#### REGRESSIONS - TR bulk ####
+
 source('USreg.R', verbose=F, echo=F)
 
 
