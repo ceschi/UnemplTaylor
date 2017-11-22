@@ -76,11 +76,12 @@ reg_call <- function(m){
     # and shut second graphic device
     dev.copy(pdf, po, height=8, width=14.6)
     invisible(dev.off())
+    
   }
   
   
   # prints the name of the model
-  cat(paste0('\n\n\n\n\n\n\n', as.character(regressions$messages[[m]]), '\n'))
+  cat(paste0('\n\n', as.character(regressions$messages[[m]]), '\n'))
   
   # prints the estimated formula
   cat('\n')
@@ -132,11 +133,16 @@ reg_call <- function(m){
     cat('\n',summary(regressions$mswm$fit[[m]]))
     cat('\n\nConverted parameters:\n')
     print(regressions$mswm$coefs[[m]])
-    par(mar=rep(1.8,4))
+    # fine tuning plots
+    par(mar=c(1,2,3,1.5), cex.main=.85)
     plotProb(regressions$mswm$fit[[m]], which=2)
-    title(paste0(j, '-state MS regimes for ', regressions$messages[[m]]), line=9.5)
+    title(paste0(j, '-state MS regimes for ', regressions$messages[[m]]), line=2.3)
     sa_plot(file.path(graphs_dir,paste0(regressions$messages[[m]], ' ',
                       j,'-state MSM.pdf')))
+    
+    # silently setting margins to default values
+    # invisible(par(mar=c(5.1,4.1,4.1,2.1)))
+    invisible(dev.off())
   }
   
   # VAR results for TR equation
@@ -145,7 +151,7 @@ reg_call <- function(m){
   
   # plots and saves IRFs
   plot(regressions$var$varirf[[m]])
-  title(paste0(regressions$messages[[m]], ' VAR IRFs, MonPol shock'), line=10)
+  title(paste0(regressions$messages[[m]], ' VAR IRFs, MonPol shock'), line=9.5)
   sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' VAR model IRFs.pdf')))
       
   

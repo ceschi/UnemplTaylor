@@ -102,6 +102,7 @@ for (i in 1:n){
                                                         names(.) %>% first())
                                 ) %>% summary() %>% coef()
   cat('\n\n')
+  print(paste0(inflation$names[[i]],',  ', k, ' exogenously defined lags'))
   print(inflation[['ark']][[i]])
 }
 
@@ -133,7 +134,7 @@ for (i in 1:n){
   
   # saves graphs in proper directory with names
   ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]], 
-                '- ', inflation[['aropti']][[i]], ' optimal lags.pdf'),
+                ' - ', inflation[['aropti']][[i]], ' optimal lags.pdf'),
          inflation[['plot_aropti']][[i]],
          device='pdf',
          graphs_dir,
