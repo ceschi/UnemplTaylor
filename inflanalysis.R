@@ -64,6 +64,11 @@ if (flag___optilag==1){
 }
 
 for (i in 1:n){
+  # saves output for every series
+  sink(file=paste0(file.path(graphs_dir, inflation$names[[i]]), ' AR inflation results.txt'),
+       append=F,
+       split=T)
+  
   ##### Unit root tests #####
   inflation[['unitroot']][[i]] <- ur.df(na.omit(pi[,i]),
                                          # DF test, max lag to consider
@@ -100,7 +105,7 @@ for (i in 1:n){
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
                                                         names(.) %>% first())
                                 ) %>% summary() %>% coef()
-  cat('\n\n')
+  cat('\n')
   print(paste0(inflation$names[[i]],',  ', k, ' exogenously defined lags'))
   print(inflation[['ark']][[i]])
   
@@ -172,6 +177,10 @@ for (i in 1:n){
          device='pdf',
          graphs_dir,
          height=8, width=14.16, units='in')
+  
+  cat('\n\n\n')
+  # stopping printing
+  sink()
 }
 
 
