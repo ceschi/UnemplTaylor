@@ -99,7 +99,7 @@ for (i in 1:n){
                                 formula=formula.maker(df=pi[,i] %>% lagger(lag=k),
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
                                                         names(.) %>% first())
-  ) %>% summary() %>% coef()
+                                ) %>% summary() %>% coef()
   cat('\n\n')
   print(paste0(inflation$names[[i]],',  ', k, ' exogenously defined lags'))
   print(inflation[['ark']][[i]])
