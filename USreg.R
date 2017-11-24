@@ -167,7 +167,9 @@ for (m in 1:length(regressions$formula)){
                )
   
   
-  # regressions$svar[[m]] <- SVAR()
+  regressions$svar[[m]] <- SVAR(regressions$var$varfit[[m]],
+                                Amat=AA
+                                )
   
   
   
