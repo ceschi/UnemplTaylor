@@ -81,6 +81,8 @@ regressions$messages <- list(
 ### Looping over different specifications
 
 for (m in 1:length(regressions$formula)){
+  
+  ##### Simple OLS with stability checks #####
 
   # fit a linear model
   regressions$models[[m]] <- lm(data=db_US, regressions$formula[[m]])
