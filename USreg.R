@@ -81,7 +81,7 @@ regressions$messages <- list(
 ### Looping over different specifications
 
 for (m in 1:length(regressions$formula)){
-  ##### Simple OLS regressions with stability checks #####
+
   # fit a linear model
   regressions$models[[m]] <- lm(data=db_US, regressions$formula[[m]])
   
@@ -119,45 +119,34 @@ for (m in 1:length(regressions$formula)){
   regressions$stab$fstatcandidates[[m]] <- breakpoints(regressions$formula[[m]],
                                                        data=as.data.frame(db_US))
   
-   
-}
-
-
-
-#### Markov Switching models with K states ####
-# looping over formulae to estimate j-state
-# Markov Switching model
-
-if (flag___msm==1) j <- 2
-if (flag___msm==2) j <- 3
-
-if (flag___msm!=0){
-for (m in 1:length(regressions$formula)){
-  regressions$mswm$fit[[m]] <- msmFit(object=regressions$models[[m]],
-                                  #data=db_US,
-                                  k=j,
-                                  sw=rep(T, 1+regressions$formula[[m]] %>% all.vars() %>% length())
-                                  )
-  regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
   
-}
-}
-
-
-
-##### VAR #####
-# Model: y_t = A_i y_{t-1} + \eps_t
-
-
-for (m in 1:length(regressions$formula)){
+  
+  #### Markov Switching models with K states ####
+  # looping over formulae to estimate j-state
+  # Markov Switching model 
+  if (flag___msm==1) j <- 2
+  if (flag___msm==2) j <- 3
+  
+  if (flag___msm!=0){
+      regressions$mswm$fit[[m]] <- msmFit(object=regressions$models[[m]],
+                                          #data=db_US,
+                                          k=j,
+                                          sw=rep(T, 1+regressions$formula[[m]] %>% all.vars() %>% length())
+                                          )
+      regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
+      
+  }
+  
+  ##### VAR #####
+  # Model: y_t = A_i y_{t-1} + \eps_t
   
   # estimate a VAR model with pre-set formulas
   regressions$var$varfit[[m]] <- VAR(y = db_US %>% as.tibble()  %>% 
-                                      select(regressions$formula[[m]] %>% all.vars(), -ffrb) %>%
-                                      na.omit(.),
-                                      lag.max = 16,
-                                      type = 'const',
-                                      ic = 'HQ')
+                                       select(regressions$formula[[m]] %>% all.vars(), -ffrb) %>%
+                                       na.omit(.),
+                                     lag.max = 16,
+                                     type = 'const',
+                                     ic = 'HQ')
   # stock irfs for 40 quarters,
   # the impulse is given to
   # the interest rate  --> might consider inclusion of 
@@ -167,32 +156,25 @@ for (m in 1:length(regressions$formula)){
                                      n.ahead=20,
                                      runs=500)
   
+  ##### Setting up environment for SVAR #####
+  
+  ## Declaration of struct matrix
+  # B mat is identity by default (orthogonal shocks)
+  AA <- matrix(ncol=regressions$formula[[m]] %>% all.vars() %>% length() - 1,
+               nrow=regressions$formula[[m]] %>% all.vars()%>% length() - 1
+               )
+  
+  
   # regressions$svar[[m]] <- SVAR()
   
   
+  
+  # housekeeping
+  rm(AA)
 }
 
 
 
-
-# stop('end of working code')
-# 
-# variables <- merge(db_US$realtime_gap,          # realtime output gap
-#                    db_US$ffr,                   # federal fund rate
-#                    db_US$deflt1,                # one period ahead GDP deflator forecast
-#                    db_US$deflt,                 # current GDP deflator nowcast
-#                    db_US$spread_sp_3m)          # SP500 v 3MTBill spread
-# 
-# VAR_spread <- VAR(varia['1967-01/2011-12'],     # period subsample, to exclude NAs
-#                   lag.max=8,                    # max lags to select
-#                   type='const',                 # VAR includes a vector for intercepts
-#                   ic='HQ')                      # selection criterion for optimal lags; HQ SC
-# 
-# 
-# summary(VAR_spread)                             # prints estimates
-# 
-# 
-# IRF_VAR_spread <- irf(VAR_spread)               # prints IRFs for VAR with spread
 # 
 # #### SVAR ####
 # # Model: Ay_t = A_i y_{t-1} + \eps_t
