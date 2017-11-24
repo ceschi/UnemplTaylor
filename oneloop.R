@@ -81,7 +81,8 @@ regressions$messages <- list(
 ### Looping over different specifications
 
 for (m in 1:length(regressions$formula)){
-
+  
+  ##### simple OLS regressions with stability checks #####
   # fit a linear model
   regressions$models[[m]] <- lm(data=db_US, regressions$formula[[m]])
   
@@ -156,21 +157,7 @@ for (m in 1:length(regressions$formula)){
                                      n.ahead=20,
                                      runs=500)
   
-  ##### Setting up environment for SVAR #####
-  
-  ## Declaration of struct matrix
-  # B mat is identity by default (orthogonal shocks)
-  AA <- matrix(ncol=regressions$formula[[m]] %>% all.vars() %>% length() - 1,
-               nrow=regressions$formula[[m]] %>% all.vars()%>% length() - 1
-               )
-  
-  
   # regressions$svar[[m]] <- SVAR()
-  
-  
-  
-  # housekeeping
-  rm(AA)
 }
 
 
