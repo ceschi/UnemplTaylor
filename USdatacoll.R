@@ -261,6 +261,10 @@ tbill_rate_1y <- as.xts(fredr_series(series_id='DGS1', frequency='q'))
 tbill_rate_10y <- as.xts(fredr_series(series_id='DGS10',frequency='q'))
 
 
+## spread btw 3m tbill and FFR
+tbill3_ffr <- as.xts(fredr_series(series_id='TB3SMFFM', frequency='q', aggregation_method='eop'))
+
+
 ## Scraping Yahoo! Finance
 
 # # determine current date, adapt the Yahoo! URL
@@ -303,8 +307,12 @@ sp_ret <- as.xts(aggregate(sp_ret, as.yearqtr(as.yearmon(time(sp_ret))), mean))
 # spread_sp <- (sp_ret - one_year)
 spread_sp_3m <- sp_ret - tbill_rate_3m
 
-spreads <- merge(spread_baa, spread_sp_3m)
-names(spreads) <- c('spread_baa', 'spread_sp_3m')
+spreads <- merge(spread_baa, spread_sp_3m, 
+                 tbill3_ffr, tbill_rate_3m,
+                 tbill_rate_1y, tbill_rate_10y)
+names(spreads) <- c('spread_baa', 'spread_sp_3m',
+                    'tbill3_ffr', 'tbill_rate_3m',
+                    'tbill_rate_1y', 'tbill_rate_10y')
 
 options("getSymbols.warning4.0"=T) # activates disclaimer v0.4
 
@@ -450,6 +458,6 @@ base, m1, m2, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
-spf_corepce, spf_cpi, spf_pce, rev_hist, ahead
-)
+spf_corepce, spf_cpi, spf_pce, rev_hist,
+tbill3_ffr)
 if (flag___singular == 1) rm(ahead)

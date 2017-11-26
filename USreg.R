@@ -41,21 +41,21 @@ regressions <- list(
 # Formulas for regressions, appended to first sublist
 regressions$formula <- list(
   # 1
-    tr_standard =  ffr ~ deflt + realtime_gap + ffrb,
+    tr_standard =  ffr ~ deflt1 + realtime_gap + ffrb,
   # 2
-    tr_layoff = ffr  ~ deflt + layoffs + ffrb,
+    tr_layoff = ffr  ~ deflt1 + layoffs + ffrb,
   # 3
-    tr_spread = ffr ~ deflt + realtime_gap + ffrb + spread_baa,
+    tr_spread = ffr ~ deflt1 + realtime_gap + ffrb + spread_baa,
   # 4
-    tr_treasury = ffr ~ deflt + realtime_gap + ffrb + spread_sp_3m,
+    tr_treasury = ffr ~ deflt1 + realtime_gap + ffrb + spread_sp_3m,                  # ADDED 1 TO ALL DEFLT
   # 5
-    tr_layspread = ffr ~ deflt + layoffs + ffrb + spread_sp_3m,
+    tr_layspread = ffr ~ deflt1 + layoffs + ffrb + spread_sp_3m,
   # 6
-    tr_laybaa = ffr ~ deflt + layoffs + ffrb + spread_baa,
+    tr_laybaa = ffr ~ deflt1 + layoffs + ffrb + spread_baa,
   # 7
     tr_spf_mean = ffr ~ spf_cpi_h1_mean + realtime_gap + ffrb,
   # 8
-    tr_spf_uncert = ffr ~ deflt + realtime_gap + ffrb + spf_cpi_h1_iqr
+    tr_spf_uncert = ffr ~ deflt1 + realtime_gap + ffrb + spf_cpi_h1_iqr
     )
 
 # Strings to indentify models 
@@ -165,8 +165,18 @@ for (m in 1:length(regressions$formula)){
   AA <- matrix(ncol=regressions$formula[[m]] %>% all.vars() %>% length() - 1,
                nrow=regressions$formula[[m]] %>% all.vars()%>% length() - 1
                )
+
+  # for bigger SVAR, bigger restrictions
+  # are required, namely the last equation
+  # is completely independent
+  if (ncol(AA)>3){
+    AA[nrow(AA), ] <- 0
+  }
+
+  # diagonal elements are set to 1
+  diag(AA) <- 1
   
-  
+  # SVAR estimation
   regressions$svar[[m]] <- SVAR(regressions$var$varfit[[m]],
                                 Amat=AA
                                 )
@@ -177,7 +187,9 @@ for (m in 1:length(regressions$formula)){
   rm(AA)
 }
 
-
+for (m in 1:length(regressions$formula)){
+  print(regressions$formula[[m]] %>% all.vars() %>% length() - 1)
+}
 
 # 
 # #### SVAR ####
