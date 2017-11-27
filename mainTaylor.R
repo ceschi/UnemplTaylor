@@ -10,7 +10,7 @@ flag___singular = 0
 
 # 0 -- the code prints out all graphs
 # 1 -- graphs are not printed but only produced and stocked
-flag___plot = 1
+flag___plot = 0
 
 # 0 -- optimal lags for inflation are off
 # 1 -- optimal lags for inflation are on

@@ -145,10 +145,13 @@ for (m in 1:length(regressions$formula)){
   ##### VAR #####
   # Model: y_t = A_i y_{t-1} + \eps_t
   
+  # slice database
+  dat <- db_US %>% as.tibble()  %>% 
+    select(regressions$formula[[m]] %>% all.vars(), -ffrb) %>%
+    na.omit(.)
+  
   # estimate a VAR model with pre-set formulas
-  regressions$var$varfit[[m]] <- VAR(y = db_US %>% as.tibble()  %>% 
-                                       select(regressions$formula[[m]] %>% all.vars(), -ffrb) %>%
-                                       na.omit(.),
+  regressions$var$varfit[[m]] <- VAR(y = dat,
                                      lag.max = 16,
                                      type = 'const',
                                      ic = 'HQ')
@@ -175,9 +178,12 @@ for (m in 1:length(regressions$formula)){
   diag(AA) <- NA
   
   # SVAR estimation
+  # Model: AAy_t = A_i y_{t-1} + \eps_t
   regressions$svar$svarfit[[m]] <- SVAR(regressions$var$varfit[[m]],
-                                Amat=AA
-                                )
+                                Amat=AA,
+                                estmethod='direct',
+                                hessian=T,
+                                method="BFGS") # alternative for method is 'CG'
   
   # SVAR IRFs
   regressions$svar$svarirf[[m]] <- irf(regressions$svar$svarfit[[m]],
@@ -187,7 +193,7 @@ for (m in 1:length(regressions$formula)){
   
   
   # housekeeping
-  rm(AA)
+  rm(AA, dat)
 }
 
 

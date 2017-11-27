@@ -130,18 +130,19 @@ reg_call <- function(m){
   # MSwM printig results and plotting
   if (flag___msm!=0){
     cat('\n\nMarkov Switching model estimation with', j, 'states')
-    cat('\n',summary(regressions$mswm$fit[[m]]))
+    cat('\n')
+    cat(summary(regressions$mswm$fit[[m]]))
     cat('\n\nConverted parameters:\n')
     print(regressions$mswm$coefs[[m]])
+    
     # fine tuning plots
-    par(mar=c(1,2,3,1.5), cex.main=.85)
+    par(mar=c(1,1,2.85,1), cex.main=.85)
     plotProb(regressions$mswm$fit[[m]], which=2)
     title(paste0(j, '-state MS regimes for ', regressions$messages[[m]]), line=2.3)
     sa_plot(file.path(graphs_dir,paste0(regressions$messages[[m]], ' ',
                       j,'-state MSM.pdf')))
     
     # silently setting margins to default values
-    # invisible(par(mar=c(5.1,4.1,4.1,2.1)))
     invisible(dev.off())
   }
   
