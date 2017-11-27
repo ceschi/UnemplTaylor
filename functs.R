@@ -69,7 +69,8 @@ reg_call <- function(m){
   
   sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regressions results.txt'),
        append=F,
-       split=T)
+       split=T,
+       type='output')
   
   sa_plot <- function(po){
     # custum function to duplicate, save as pdf 
@@ -167,7 +168,7 @@ reg_call <- function(m){
   
   
   # stopping printing
-  sink()
+  sink(file=NULL)
 }
 
 rollm <- function(df, formula){
