@@ -283,7 +283,8 @@ tbill3_ffr <- as.xts(fredr_series(series_id='TB3SMFFM', frequency='q', aggregati
 #                      `Adj Close` = col_double()
 #                    ))
 
-options("getSymbols.warning4.0"=FALSE) # disables disclaimer about version update
+options("getSymbols.warning4.0"=FALSE)
+options("getSymbols.yahoo.warning"=FALSE)# disables disclaimer about version update
 # downloads daily prices time series through new Yahoo! API
 # to be fixed sooner than later
 sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',

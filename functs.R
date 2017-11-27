@@ -153,15 +153,20 @@ reg_call <- function(m){
   plot(regressions$var$varirf[[m]])
   title(paste0(regressions$messages[[m]], ' VAR IRFs, MonPol shock'), line=9.5)
   sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' VAR model IRFs.pdf')))
+  
+  # SVAR results restricted to TR
+  # thus dropping other eq'ns
+  print(summary(regressions$svar$svarfit[[m]], equation='ffr'))
+  
+  # plots and save SVAR IRFs
+  plot(regressions$svar$svarirf[[m]])
+  title(paste0(regressions$messages[[m]], ' SVAR IRFs, MonPol shock'), line=9.5)
+  sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' SVAR model IRFs.pdf')))
       
   
   
   # stopping printing
   sink()
-  ##################################################
-  ############# !!! WORK IN PROGRESS !!! ###########
-  ##################################################
-
 }
 
 rollm <- function(df, formula){

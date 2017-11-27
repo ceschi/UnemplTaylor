@@ -34,7 +34,10 @@ regressions <- list(
     varfit=list(),
     varirf=list()
   ),
-  svar=list(),
+  svar=list(
+    svarfit=list(),
+    svarirf=list()
+  ),
   plot=list()
 )
 
@@ -156,40 +159,38 @@ for (m in 1:length(regressions$formula)){
   regressions$var$varirf[[m]] <- irf(regressions$var$varfit[[m]],
                                      impulse='ffr',
                                      n.ahead=20,
-                                     runs=500)
+                                     runs=250)
   
   ##### Setting up environment for SVAR #####
   
   ## Declaration of struct matrix
   # B mat is identity by default (orthogonal shocks)
-  AA <- matrix(ncol=regressions$formula[[m]] %>% all.vars() %>% length() - 1,
-               nrow=regressions$formula[[m]] %>% all.vars()%>% length() - 1
-               )
+  # all off-diagonal elements are suppressed
+  # from the estimation <- CAREFUL!
+  AA <- matrix(0, ncol=regressions$formula[[m]] %>% all.vars() %>% length() - 1,
+               nrow=regressions$formula[[m]] %>% all.vars()%>% length() - 1)
 
-  # for bigger SVAR, bigger restrictions
-  # are required, namely the last equation
-  # is completely independent
-  if (ncol(AA)>3){
-    AA[nrow(AA), ] <- 0
-  }
-
-  # diagonal elements are set to 1
-  diag(AA) <- 1
+  # diagonal elements are set to NA
+  # so to be estimated
+  diag(AA) <- NA
   
   # SVAR estimation
-  regressions$svar[[m]] <- SVAR(regressions$var$varfit[[m]],
+  regressions$svar$svarfit[[m]] <- SVAR(regressions$var$varfit[[m]],
                                 Amat=AA
                                 )
   
+  # SVAR IRFs
+  regressions$svar$svarirf[[m]] <- irf(regressions$svar$svarfit[[m]],
+                                       impulse='ffr',
+                                       n.ahead=20,
+                                       runs=250)
   
   
   # housekeeping
   rm(AA)
 }
 
-for (m in 1:length(regressions$formula)){
-  print(regressions$formula[[m]] %>% all.vars() %>% length() - 1)
-}
+
 
 # 
 # #### SVAR ####
