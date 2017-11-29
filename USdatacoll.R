@@ -233,8 +233,7 @@ gdp_waves <- read_excel(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'),
 cols <- ncol(gdp_waves)
 
 options(warn=-1) # line below produces more than 50 warnings as it produces NAs, which I want
-#gdp_waves$DATE <- as.character(gdp_waves$DATE)
-#gdp_waves[, 2:ncol(gdp_waves)] <- lapply(gdp_waves[, 2:ncol(gdp_waves)], function(x) as.numeric(levels(x))[x])
+
 
 
 
