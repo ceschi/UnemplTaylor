@@ -1,20 +1,14 @@
 # UnemplTaylor
-Code for TR estim
+Code for TR estimates.
+
+Highly automated, this set of scripts downloads, assembles macroeconomic time series on the US economy and then uses the tidy dataset to estimate a number of TR specifications through simple OLS with stability checks, Markov Switching Models (two or three states), VAR and SVAR. Results are stored and output in rule-specific text files, alongside with all plots produced. In addition, the composed dataset is stored in a proper CSV file with xts time series features, for later use. 
 
 
-A proper read.me file with info will be redacted once the project achieves a more-than-embrional level.
 
+### Todo list:
 
-Todo list:
-* Data
-	+ SPF
-	+ VIX
-	+ Mon Meas
-* EKN work
-	+ OLS ext w\ layoffs
-	+ MSW
-	+ ECM
-	+ WuXia
-	+ White & BreuschPagan for \pi
 * Reda
-	+ plot & tabs
+	+ tabs and latex output
+	+ switch to javaless xlsx import
+	+ automate to Pi via chron
+	
