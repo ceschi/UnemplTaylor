@@ -545,7 +545,7 @@ pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
           'tseries', 'dynlm', 'stargazer',
           'dyn', 'strucchange', 'xts',
           'MASS', 'car',
-          'mFilter', 'fredr', 'xlsx',
+          'mFilter', 'fredr',
           'readr', 'quantmod',
           'devtools', 'lubridate',
           'readxl', 'urcabis')
