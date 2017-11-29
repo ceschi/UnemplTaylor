@@ -44,14 +44,14 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-ti
 # reads the single interesting sheets and
 # imports them in df format
 
-classi <- c('character', rep('numeric', 14), 'character')
+classi <- c('text', rep('numeric', 14), 'text')
 
-cpi_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'), 
-                            sheetName='gPCPI', colClasses=classi)
-core_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'),
-                             sheetName='gPCPIX', colClasses=classi)
-deflator_greenbook <- read.xlsx2(file.path(temp_dir,'Greenbook_allvar_row.xls'),
-                                 sheetName='gPGDP', colClasses=classi)
+cpi_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'), 
+                            sheet='gPCPI', col_types=classi, na='#N/D')
+core_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
+                             sheet='gPCPIX', col_types=classi, na='#N/D')
+deflator_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
+                                 sheet='gPGDP', col_types=classi, na='#N/D')
 
 # replace NAs
 cpi_greenbook[cpi_greenbook=='NaN'] <- NA
@@ -228,13 +228,13 @@ gap_expost <- (actual-capacity)*100/capacity
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/real-time-data/data-files/files/xlsx/routputqvqd.xlsx?la=en',
               file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb')
 
-gdp_waves <- read.xlsx2(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), 
-                        sheetName='ROUTPUT')
+gdp_waves <- read_excel(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), 
+                        sheet='ROUTPUT', na='#N/A')
 cols <- ncol(gdp_waves)
 
 options(warn=-1) # line below produces more than 50 warnings as it produces NAs, which I want
-gdp_waves$DATE <- as.character(gdp_waves$DATE)
-gdp_waves[, 2:ncol(gdp_waves)] <- lapply(gdp_waves[, 2:ncol(gdp_waves)], function(x) as.numeric(levels(x))[x])
+#gdp_waves$DATE <- as.character(gdp_waves$DATE)
+#gdp_waves[, 2:ncol(gdp_waves)] <- lapply(gdp_waves[, 2:ncol(gdp_waves)], function(x) as.numeric(levels(x))[x])
 
 
 
@@ -289,7 +289,7 @@ options("getSymbols.yahoo.warning"=FALSE)# disables disclaimer about version upd
 # to be fixed sooner than later
 sp_ret <- getSymbols(src='yahoo', Symbols='^GSPC',
                      from='1950-01-03',
-                     to=format(Sys.Date(), '%Y-%m-%d'),
+                     to=format(Sys.Date()-1, '%Y-%m-%d'),
                      auto.assign = F)
 
 # aggregating up to quarterly data
