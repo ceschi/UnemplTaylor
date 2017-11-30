@@ -10,7 +10,7 @@ flag___singular = 0
 
 # 0 -- the code prints out all graphs
 # 1 -- graphs are not printed but only produced and stocked
-flag___plot = 0
+flag___plot = 1
 
 # 0 -- optimal lags for inflation are off
 # 1 -- optimal lags for inflation are on
@@ -67,7 +67,7 @@ r=1
 # to get interesting results
 wind=58
 
-source('inflanalysis.r')
+source('inflanalysis.R')
 
 
 ##### VISUALIZATION ####
