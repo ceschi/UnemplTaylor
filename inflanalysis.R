@@ -28,6 +28,7 @@ if (flag___singular == 1){
 pi <- merge(db_US$cpit,
             db_US$coret,
             db_US$deflt,
+            db_US$deflt1
             db_US$rev_cpi,
             db_US$rev_cpi_fe,
             db_US$rev_defl,
@@ -42,6 +43,7 @@ inflation <- list(
   names=list('CPI nowcast',
              'Core nowcast',
              'GDP deflator nowcast',
+             'GDP deflator forecast'
              'Revised CPI',
              'Revised CPI, no FE',
              'Revised GDP deflator',
