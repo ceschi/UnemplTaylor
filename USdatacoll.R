@@ -381,23 +381,19 @@ names(money_g) <- c('base_g', 'm1_g', 'm2_g')
 # automatize download of the xlsx file, import, run statistics and merge
 
 # download CPI inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/
-              real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb')
 
 # download CORE CPI inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/
-              real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb')
 
 # download PCE inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/
-              real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb')
 
 # download CORE PCE inflation rate file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/
-              real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
+download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb')
 
 
