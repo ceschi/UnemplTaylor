@@ -10,7 +10,7 @@ if (flag___singular == 1){
   source('functs.R')
   source('USdatacoll.R')
   # exogenous lag
-  k=5
+  k=1
   
   # selector for coefficient
   # AR(r) will be plotted
@@ -28,7 +28,7 @@ if (flag___singular == 1){
 pi <- merge(db_US$cpit,
             db_US$coret,
             db_US$deflt,
-            db_US$deflt1
+            db_US$deflt1,
             db_US$rev_cpi,
             db_US$rev_cpi_fe,
             db_US$rev_defl,
