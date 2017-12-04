@@ -43,7 +43,7 @@ inflation <- list(
   names=list('CPI nowcast',
              'Core nowcast',
              'GDP deflator nowcast',
-             'GDP deflator forecast'
+             'GDP deflator forecast',
              'Revised CPI',
              'Revised CPI, no FE',
              'Revised GDP deflator',
