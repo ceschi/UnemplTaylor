@@ -8,6 +8,7 @@ Highly automated, this set of scripts downloads, assembles macroeconomic time se
 ### Todo list:
 
 * Reda
+	+ improve graphs on short series
 	+ tabs and latex output
 	+ switch to javaless xlsx import
 	+ automate to Pi via chron
