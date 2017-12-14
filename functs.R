@@ -548,11 +548,12 @@ pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
           'mFilter', 'fredr',
           'readr', 'quantmod',
           'devtools', 'lubridate',
-          'readxl', 'urcabis')
+          'readxl')
 # fill pkgs with names of the packages to install
 
 devtools::install_github('sboysel/fredr')
 devtools::install_github('ceschi/urcabis')
+#library(urcabis)
 
 instant_pkgs(pkgs)
 
