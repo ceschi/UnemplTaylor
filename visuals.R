@@ -11,14 +11,15 @@ if (flag___singular==1) library(ggplot2, xts)
 
 
 # TR variables
-plot_trvars <- ggplot(db_US, aes(x=index(db_US)))+
+plot_trvars <- ggplot(db_US["1945/"], aes(x=index(db_US["1945/"])))+
   geom_line(aes(y=ffr, color='FFR'), size=1)+
   geom_line(aes(y=rev_defl, color='Act. Infl.'), size=1)+
   geom_line(aes(y=deflt1, color='Exp. Infl.'), size=1)+
   geom_line(aes(y=realtime_gap, color='Gap'), size=1)+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
   ggtitle('US Taylor rule - main components')+
-  scale_y_continuous()+scale_x_yearqtr(format='%Y Q%q', n=20)+
+  scale_y_continuous()+
+  scale_x_yearqtr(format='%Y Q%q', n=20)+
   geom_hline(yintercept = 0, colour='black')
 
 if (flag___plot==0) print(plot_trvars)
@@ -30,7 +31,7 @@ ggsave(plot_trvars,
        height=8, width=14.6, units='in')
 
 # Measures of inflation, revised ones
-plot_re_infl <- ggplot(db_US, aes(x=index(db_US)))+
+plot_re_infl <- ggplot(db_US["1945/"], aes(x=index(db_US["1945/"])))+
   geom_line(aes(y=rev_cpi, colour='Rev. Infl.'))+
   geom_line(aes(y=rev_cpi_fe, colour='Rev. Infl. no FE'))+
   geom_line(aes(y=rev_pce, colour='Rev. PCE'))+
@@ -38,7 +39,8 @@ plot_re_infl <- ggplot(db_US, aes(x=index(db_US)))+
   geom_line(aes(y=rev_defl, colour='Rev. Defl.'))+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
   ggtitle('Measures of historical inflation')+
-  scale_y_continuous()+scale_x_yearqtr(format='%Y Q%q', n=20)+
+  scale_y_continuous()+
+  scale_x_yearqtr(format='%Y Q%q', n=20)+
   geom_hline(yintercept = 0, colour='black')
   
 if (flag___plot==0) print(plot_re_infl)
@@ -52,14 +54,15 @@ ggsave(plot = plot_re_infl,
 
 
 # Measures of slackness in the economy
-plot_slack <- ggplot(db_US, aes(x=index(db_US)))+
+plot_slack <- ggplot(db_US["1945/"], aes(x=index(db_US["1945/"])))+
   geom_line(aes(y=layoffs, colour='Layoff rate'))+
   geom_line(aes(y=employment_fluct, colour='NU gap'))+
   geom_line(aes(y=realtime_gap, colour='Realtime gap'))+
   geom_line(aes(y=expost_gap, colour='ExPost gap'))+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
   ggtitle('Measures of slackness')+
-  scale_y_continuous()+scale_x_yearqtr(format='%Y Q%q', n=20)+
+  scale_y_continuous()+
+  scale_x_yearqtr(format='%Y Q%q', n=20)+
   geom_hline(yintercept = 0, colour='black')
 
 if (flag___plot==0) print(plot_slack)
@@ -72,13 +75,14 @@ ggsave(plot = plot_slack,
 
 
 # Inflation forecasts and nowcasts
-plot_nowinf <- ggplot(db_US, aes(x=index(db_US)))+
+plot_nowinf <- ggplot(db_US["1965/"], aes(x=index(db_US["1965/"])))+
   geom_line(aes(y=cpit, colour='CPI'))+
   geom_line(aes(y=coret, colour='Core (PCE?)'))+
   geom_line(aes(y=deflt, colour='Deflator'))+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
   ggtitle('Current period inflation forecasts')+
-  scale_y_continuous()+scale_x_yearqtr(format='%Y Q%q', n=20)+
+  scale_y_continuous()+
+  scale_x_yearqtr(format='%Y Q%q', n=20)+
   geom_hline(yintercept = 0, colour='black')
 
 if (flag___plot==0) print(plot_nowinf)
@@ -90,7 +94,7 @@ ggsave(plot = plot_nowinf,
        height=8, width=14.6, units='in')
 
 # one quarter ahead inflation forecasts
-plot_hinf <- ggplot(db_US, aes(x=index(db_US)))+
+plot_hinf <- ggplot(db_US["1965/"], aes(x=index(db_US["1965/"])))+
   geom_line(aes(y=cpit1, colour='CPI'))+
   geom_line(aes(y=coret1, colour='Core (PCE?)'))+
   geom_line(aes(y=deflt1, colour='Deflator'))+
@@ -108,7 +112,7 @@ ggsave(plot = plot_hinf,
        height=8, width=14.6, units='in')
 
 # Inflation forecasts coming from SPF
-plot_spf_fore <- ggplot(db_US, aes(x=index(db_US)))+
+plot_spf_fore <- ggplot(db_US["1980/"], aes(x=index(db_US["1980/"])))+
   geom_line(aes(y=spf_cpi_h1_mean, colour='SPF CPI mean'))+
   geom_line(aes(y=spf_corecpi_h1_mean, colour='SPF core CPI mean'))+
   geom_line(aes(y=spf_pce_h1_mean, colour='SPF PCE mean'))+
@@ -127,7 +131,7 @@ ggsave(plot = plot_spf_fore,
        height=8, width=14.6, units='in')
 
 # Inflation forecast disagreement among SPF
-plot_spf_iqr <- ggplot(db_US, aes(x=index(db_US)))+
+plot_spf_iqr <- ggplot(db_US["1980/"], aes(x=index(db_US["1980/"])))+
   geom_line(aes(y=spf_cpi_h1_iqr, colour='SPF CPI'))+
   geom_line(aes(y=spf_corecpi_h1_iqr, colour='SPF core CPI'))+
   geom_line(aes(y=spf_pce_h1_iqr, colour='SPF PCE'))+
@@ -146,7 +150,7 @@ ggsave(plot = plot_spf_iqr,
        height=8, width=14.6, units='in')
 
 # Monetary levels
-plot_money <- ggplot(db_US, aes(x=index(db_US)))+
+plot_money <- ggplot(db_US["1955/"], aes(x=index(db_US["1955/"])))+
   geom_line(aes(y=base, colour='Base mon.'))+
   geom_line(aes(y=m1, colour='M1'))+
   geom_line(aes(y=m2, colour='M2'))+
@@ -164,7 +168,7 @@ ggsave(plot = plot_money,
        height=8, width=14.6, units='in')
 
 # spreads
-plot_spread <- ggplot(db_US, aes(x=index(db_US)))+
+plot_spread <- ggplot(db_US["1950/"], aes(x=index(db_US["1950/"])))+
   geom_line(aes(y=spread_baa, colour='BAA'))+
   geom_line(aes(y=spread_sp_3m, colour='3m SP'))+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
