@@ -60,9 +60,9 @@ core_greenbook[core_greenbook=='NaN'] <- NA
 deflator_greenbook[deflator_greenbook=='NaN'] <- NA
 
 # drop useless columns
-cpi_greenbook[,c(2:5, 16, 15)] <- NULL
-core_greenbook[,c(2:5, 16, 15)] <- NULL
-deflator_greenbook[,c(2:5, 16, 15)] <- NULL
+cpi_greenbook <- cpi_greenbook[,-c(2:5, 16, 15)]
+core_greenbook <- core_greenbook[,-c(2:5, 16, 15)]
+deflator_greenbook <- deflator_greenbook[,-c(2:5, 16, 15)]
 
 # name columns
 names(cpi_greenbook) <- c('date', 'cpit', paste(rep('cpit', 7), 1:8, sep=''))
