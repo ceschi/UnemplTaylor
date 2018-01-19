@@ -2,10 +2,6 @@
 
 if (flag___singular==1) library(ggplot2, xts)
 
-######################################################
-##########  SUBSET DB SO TO GET NICER GRAPHS  ########
-######################################################
-
 
 ##### Plots of general variables #####
 
