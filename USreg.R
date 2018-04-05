@@ -144,6 +144,7 @@ for (m in 1:length(regressions$formula)){
   
   ##### VAR #####
   # Model: y_t = A_i y_{t-1} + \eps_t
+  ## revise ordering and choleski dec side
   
   # slice database
   dat <- db_US %>% as.tibble()  %>% 
@@ -175,6 +176,8 @@ for (m in 1:length(regressions$formula)){
 
   # diagonal elements are set to NA
   # so to be estimated
+  # next step is to autamete contemporaneuous
+  # interactions with due restrictions
   diag(AA) <- NA
   
   # SVAR estimation
@@ -192,6 +195,12 @@ for (m in 1:length(regressions$formula)){
                                        runs=250)
   
   
+
+
+  ##### sign-restricted vars shall #####
+  # be next implementation via VARsignR pkg
+
+
   # housekeeping
   rm(AA, dat)
 }
