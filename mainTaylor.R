@@ -3,6 +3,8 @@
 
 
 #### Flagging
+# make this interactive at the beginning of the 
+# script
 
 # 0 -- the code runs entirely, all different parts composed
 # 1 -- when files are run singularily
