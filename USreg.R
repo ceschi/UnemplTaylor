@@ -195,39 +195,3 @@ for (m in 1:length(regressions$formula)){
   # housekeeping
   rm(AA, dat)
 }
-
-
-
-# 
-# #### SVAR ####
-# # Model: Ay_t = A_i y_{t-1} + \eps_t
-# 
-# # Declare A matrix 
-# SVAR_Amat <- matrix(c(NA,NA,NA,0,0,
-#                       NA,NA,NA,0,NA,
-#                       0,NA,NA,0,0,
-#                       NA,0,NA,NA,0,
-#                       NA,NA,0,0,NA), 
-#                     nrow=5, ncol=5, byrow=T)
-# 
-# SVAR_Amat_alt <- matrix(c(NA,NA,NA,0,0,
-#                           NA,NA,NA,0,NA,
-#                           0,NA,NA,0,0,
-#                           NA,0,NA,NA,0,
-#                           0,0,NA,0,NA), 
-#                         nrow=5, ncol=5, byrow=T) # alternative A matrix specification
-# 
-# SVAR_spread <- SVAR(VAR_spread,
-#                     Amat=SVAR_Amat,
-#                     Bmat=NULL,
-#                     estmethod='direct', hessian=T, method='CG')
-# 
-# IRF_SVAR_spread <- irf(SVAR_spread)
-# 
-# plot(IRF_SVAR_spread)
-
-
-
-
-# housekeeping
-# rm()

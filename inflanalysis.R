@@ -77,7 +77,7 @@ for (i in 1:n){
                                         lags=llags,
                                          # lags selection criterion, min BIC
                                          selectlags='BIC')
-  # storing optimal lags !!!! TO BETTER UNDERSTAND !!!!
+  # storing optimal lags -- forked urca pkg
   
   if (flag___optilag==1) inflation[['aropti']][[i]]<- inflation[['unitroot']][[i]]@optilags
   
@@ -102,6 +102,7 @@ for (i in 1:n){
   
   
   ##### AR regression with fixed lags k=5 #####
+  # k= 5 as standard practice but this might vary
   inflation[['ark']][[i]] <- lm(data= (pi[,i] %>% lagger(lag=k)),
                                 formula=formula.maker(df=pi[,i] %>% lagger(lag=k),
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
