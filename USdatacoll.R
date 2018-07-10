@@ -23,7 +23,7 @@ if (flag___singular == 1){
 
 #### FEDERAL INTEREST RATE ####
 
-fredr_key('5d4b5f1e6667727ee4ea90affbad1e6a')
+fredr_set_key('5d4b5f1e6667727ee4ea90affbad1e6a')
 # key for the FRED API
 
 ffr <- as.xts(fredr_series(series_id='FEDFUNDS', frequency='m'))
