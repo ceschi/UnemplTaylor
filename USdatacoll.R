@@ -26,7 +26,7 @@ if (flag___singular == 1){
 fredr_set_key('5d4b5f1e6667727ee4ea90affbad1e6a')
 # key for the FRED API
 
-ffr <- fredr_series(series_id='FEDFUNDS', frequency='m') %>% tbl_xts()
+ffr <- fredr_series_observations(series_id='FEDFUNDS', frequency='m') %>% tbl_xts()
 ffr <- as.xts(aggregate(ffr, as.yearqtr(as.yearmon(time(ffr))), last))
 # aggregates up to quarters picking quarter's last month value
 
@@ -112,31 +112,31 @@ rates.mean <- merge(ffrate, cpi.mean, core.mean, defl.mean)
 rev_hist <- merge(
 
           # Consumer Price Index for All Urban Consumers: All Items 
-          rev_pci = fredr_series(series_id='CPIAUCSL', 
+          rev_pci = fredr_series_observations(series_id='CPIAUCSL', 
                                           frequency='q', 
                                         aggregation_method='eop', 
                                         units='pc1') %>% tbl_xts(), 
           
           # Consumer Price Index for All Urban Consumers: All Items Less Food and Energy
-          rev_pci_fe  = fredr_series(series_id='CPILFESL', 
+          rev_pci_fe  = fredr_series_observations(series_id='CPILFESL', 
                                             frequency='q', 
                                             aggregation_method='eop', 
                                             units='pc1') %>% tbl_xts(),
           
           # Gross Domestic Product: Implicit Price Deflator
-          rev_defl = fredr_series(series_id='GDPDEF', 
+          rev_defl = fredr_series_observations(series_id='GDPDEF', 
                                           frequency='q', 
                                          aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
           
           # Personal Consumption Expenditures Excluding Food and Energy
-          rev_pce  = fredr_series(series_id='PCE', 
+          rev_pce  = fredr_series_observations(series_id='PCE', 
                                              frequency='q', 
                                          aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
           
           # Personal Consumption Expenditures Excluding Food and Energy
-          rev_pce_fe  = fredr_series(series_id='PCEPILFE', 
+          rev_pce_fe  = fredr_series_observations(series_id='PCEPILFE', 
                                             frequency='q', 
                                             aggregation_method='eop', 
                                             units='pc1') %>% tbl_xts()
@@ -186,19 +186,19 @@ names(rev_hist) <-  c('rev_cpi', 'rev_cpi_fe', 'rev_defl',
 
 ## UNEMPLOYMENT METRICS ####
 
-claims <- fredr_series(series_id='ICSA', frequency='q', aggregation_method='sum') %>% tbl_xts()
+claims <- fredr_series_observations(series_id='ICSA', frequency='q', aggregation_method='sum') %>% tbl_xts()
 # initial claims, number
 
-natural_unemp_short <- fredr_series(series_id='NROUST', frequency='q') %>% tbl_xts()
+natural_unemp_short <- fredr_series_observations(series_id='NROUST', frequency='q') %>% tbl_xts()
 # natural employment on the short run
 
-natural_unemp_long <- fredr_series(series_id='NROU', frequency='q') %>% tbl_xts()
+natural_unemp_long <- fredr_series_observations(series_id='NROU', frequency='q') %>% tbl_xts()
 # longer term natural unemployment rate
 
-current_unemp <- fredr_series(series_id='UNRATE', frequency='q') %>% tbl_xts()
+current_unemp <- fredr_series_observations(series_id='UNRATE', frequency='q') %>% tbl_xts()
 # current unemployment rate
 
-tot_emp <- fredr_series(series_id='PAYEMS', frequency='q') %>% tbl_xts() %>% `*`(.,1000)
+tot_emp <- fredr_series_observations(series_id='PAYEMS', frequency='q') %>% tbl_xts() %>% `*`(.,1000)
 # total employed, thousands
 
 ## Unemployment manipulation
@@ -216,10 +216,10 @@ names(unemployment) <- c('layoffs', 'employment_fluct')
 #### OUTPUT GAPS ####
 # expost gap
 
-capacity <- fredr_series(series_id='GDPPOT', frequency='q') %>% tbl_xts()
+capacity <- fredr_series_observations(series_id='GDPPOT', frequency='q') %>% tbl_xts()
 # real installed capacity, 2009 chained dollars
 
-actual <- fredr_series(series_id='GDPC1', frequency='q') %>% tbl_xts()
+actual <- fredr_series_observations(series_id='GDPC1', frequency='q') %>% tbl_xts()
 # actual gdp
 
 gap_expost <- (actual-capacity)*100/capacity
@@ -250,20 +250,20 @@ options(warn=0) # reactivates warnings
 ##### SPREADS ####
 
 ## BAA 10Y bonds        !!! - DISCONTINUED BY FRED - !!!
-spread_baa <- fredr_series(series_id='BAA10Y', frequency='q') %>% tbl_xts()
+spread_baa <- fredr_series_observations(series_id='BAA10Y', frequency='q') %>% tbl_xts()
 
 ## 3 months Tbill rate
-tbill_rate_3m <- fredr_series(series_id='TB3MS',frequency='q') %>% tbl_xts()
+tbill_rate_3m <- fredr_series_observations(series_id='TB3MS',frequency='q') %>% tbl_xts()
 
 ## 1 year
-tbill_rate_1y <- fredr_series(series_id='DGS1', frequency='q') %>% tbl_xts()
+tbill_rate_1y <- fredr_series_observations(series_id='DGS1', frequency='q') %>% tbl_xts()
 
 ## 10 years 
-tbill_rate_10y <- fredr_series(series_id='DGS10',frequency='q') %>% tbl_xts()
+tbill_rate_10y <- fredr_series_observations(series_id='DGS10',frequency='q') %>% tbl_xts()
 
 
 ## spread btw 3m tbill and FFR
-tbill3_ffr <- fredr_series(series_id='TB3SMFFM', frequency='q', aggregation_method='eop') %>% tbl_xts()
+tbill3_ffr <- fredr_series_observations(series_id='TB3SMFFM', frequency='q', aggregation_method='eop') %>% tbl_xts()
 
 
 ## Scraping Yahoo! Finance
@@ -305,7 +305,7 @@ sp_ret <- to.monthly(sp_ret)
 sp_ret <- diff(log(sp_ret$sp_ret.Close))*100
 sp_ret <- as.xts(aggregate(sp_ret, as.yearqtr(as.yearmon(time(sp_ret))), mean))
 
-# one_year <- fredr_series(series_id='DGS1', frequency='q') %>% tbl_xts()
+# one_year <- fredr_series_observations(series_id='DGS1', frequency='q') %>% tbl_xts()
 # spread_sp <- (sp_ret - one_year)
 spread_sp_3m <- sp_ret - tbill_rate_3m
 
@@ -322,12 +322,12 @@ options("getSymbols.warning4.0"=T) # activates disclaimer v0.4
 
 #### DEFICIT as % OF GDP
 
-surplus_season <- fredr_series(series_id='M318501Q027NBEA', frequency='q') %>% tbl_xts()
+surplus_season <- fredr_series_observations(series_id='M318501Q027NBEA', frequency='q') %>% tbl_xts()
 
 inizio <- as.Date(min(time(surplus_season)), format='%Y-%m-%d')
 fine <- as.Date(max(time(surplus_season)), format='%Y-%m-%d')
 
-gdp <- fredr_series(series_id='GDP', frequency='q',
+gdp <- fredr_series_observations(series_id='GDP', frequency='q',
                            observation_start= inizio,
                            observation_end= fine) %>% tbl_xts()
 
@@ -344,17 +344,17 @@ names(surplus_gdp) <- 'surplus_gdp'
  
 #### DEBT 
 # debt to gdp series
-debt_gdp <- fredr_series(series_id='GFDEGDQ188S', frequency='q') %>% tbl_xts()
+debt_gdp <- fredr_series_observations(series_id='GFDEGDQ188S', frequency='q') %>% tbl_xts()
 
 # debt level, millions of $
-debt_lev <- fredr_series(series_id='GFDEBTN', frequency='q') %>% tbl_xts()
+debt_lev <- fredr_series_observations(series_id='GFDEBTN', frequency='q') %>% tbl_xts()
 
 # debt growth rate to proxy deficit
 debt_g <- diff(log(debt_lev))*100
 
 
 # debt held by FED, billions of $
-debt_fed <- fredr_series(series_id = 'FDHBFRBN', frequency='q') %>% tbl_xts()
+debt_fed <- fredr_series_observations(series_id = 'FDHBFRBN', frequency='q') %>% tbl_xts()
 
 
 # percentage of debt held by FED
@@ -366,9 +366,9 @@ names(fiscal) <- c('surplus_gdp', 'debt_growth', 'debt_gdp', 'debt_fed', 'debt_f
 
 #### MONEY AGGREGATES 
 
-base <- fredr_series(series_id='BOGMBASE', frequency='q') %>% tbl_xts() %>% `/`(.,1000)
-m1 <- fredr_series(series_id='M1SL', frequency='q') %>% tbl_xts()
-m2 <- fredr_series(series_id='M2SL', frequency='q') %>% tbl_xts()
+base <- fredr_series_observations(series_id='BOGMBASE', frequency='q') %>% tbl_xts() %>% `/`(.,1000)
+m1 <- fredr_series_observations(series_id='M1SL', frequency='q') %>% tbl_xts()
+m2 <- fredr_series_observations(series_id='M2SL', frequency='q') %>% tbl_xts()
 
 money <- merge(base, m1, m2)
 names(money) <- c('base', 'm1', 'm2')

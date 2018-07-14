@@ -182,10 +182,10 @@ rollm <- function(df, formula){
   # extracts point estimates and 2*SD (+- 95%),
   # put info in named row tibble dropping 
   # intercept info from first column
-  cofs <- as.tibble(coefficients(lmod)[2:(lmod %>% coefficients() 
-                                          %>% t() %>% ncol()),1] %>% t())
-  SD2 <- as.tibble(2*coefficients(lmod)[2:(lmod %>% coefficients() 
-                                           %>% t() %>% ncol()),2] %>% t())
+  cofs <- as.tibble(coefficients(lmod)[2:(lmod %>% coefficients() %>% 
+                                            t() %>% ncol()),1] %>% t())
+  SD2 <- as.tibble(2*coefficients(lmod)[2:(lmod %>% coefficients() %>% 
+                                            t() %>% ncol()),2] %>% t())
   
   # adds suffix for bands
   names(SD2) <- paste0(names(SD2), '.SD2')
@@ -337,6 +337,9 @@ formula.maker <- function(df, y){
   
   fomu <- as.formula(paste(y, 
                            paste(names(df)[names(df)!=y], collapse='+'),
+                           # paste(c(0,names(df)[names(df)!=y]), collapse='+'),
+                           # this prevents to have a constant but breaks the
+                           # functioning of the code 
                            sep='~'))
   attr(fomu, which='.Environment') <- .GlobalEnv
   return(fomu)

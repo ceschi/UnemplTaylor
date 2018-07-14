@@ -57,11 +57,14 @@ source('USreg.R', verbose=F, echo=F)
 
 
 # exogenous lag
-k=5
+# ideally cycling through different values
+# like 1 3 5
+k=1
+
 
 # selector for coefficient
 # AR(r) will be plotted
-# MUST be <k
+# MUST be =<k
 r=1
 
 # select window width for
