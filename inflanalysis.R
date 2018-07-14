@@ -10,7 +10,7 @@ if (flag___singular == 1){
   source('functs.R')
   source('USdatacoll.R')
   # exogenous lag
-  k=1
+  k=5
   
   # selector for coefficient
   # AR(r) will be plotted
@@ -102,7 +102,7 @@ for (i in 1:n){
   
   
   ##### AR regression with fixed lags k=5 #####
-  # k= 5 as standard practice but this might vary
+  # k = 5 as standard practice but this might vary
   inflation[['ark']][[i]] <- lm(data= (pi[,i] %>% lagger(lag=k)),
                                 formula=formula.maker(df=pi[,i] %>% lagger(lag=k),
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
@@ -170,7 +170,8 @@ for (i in 1:n){
     geom_line(aes(y=1), colour='black', size=.8)+
     # plot makeup
     geom_smooth(method='loess', colour='blue')+scale_x_yearqtr(format='%Y Q%q', n=20)+theme_bw()+
-    scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) + ggtitle(inflation$names[[i]])
+    scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) + 
+    ggtitle(paste0(inflation$names[[i]], ' - ', k, ' exogneous lags'))
   
   if  (flag___plot==0) plot(inflation[['plot_rollm']][[i]])
   
