@@ -129,7 +129,7 @@ rev_hist <- merge(
                                          aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
           
-          # Personal Consumption Expenditures Excluding Food and Energy
+          # Personal Consumption Expenditures including Food and Energy
           rev_pce  = fredr_series_observations(series_id='PCE', 
                                              frequency='q', 
                                          aggregation_method='eop', 
