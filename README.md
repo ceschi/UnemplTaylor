@@ -9,7 +9,11 @@ Highly automated, this set of scripts downloads, assembles macroeconomic time se
 
 * Reda
 	+ ~~improve graphs on short series~~
-	+ tabs and latex output
+	+ ~~tabs and latex output
 	+ switch to javaless xlsx import
 	+ ~~automate to Pi via chron~~
+	+ re-script USreg to output regs of interest-> switch to lapply
+	+ extend regressions$formula
+	+ possibly add bootstrapping
+	
 	
