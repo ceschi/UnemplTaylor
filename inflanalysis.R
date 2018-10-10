@@ -20,7 +20,7 @@ if (flag___singular == 1){
   # select window width for
   # rolling estimates, pick <80
   # to get interesting results
-  wind=58
+  wind=56 # as Pivetta and Reis, 14y. Alter: 5y
 }
 
 ##### Subset columns to have inflations ####
@@ -41,7 +41,7 @@ n=length(names(pi))
 # results collector
 inflation <- list(
   names=list('CPI nowcast',
-             'Core nowcast',
+             'PCE nowcast',
              'GDP deflator nowcast',
              'GDP deflator forecast',
              'Revised CPI',
@@ -107,15 +107,15 @@ for (i in 1:n){
                                 formula=formula.maker(df=pi[,i] %>% lagger(lag=k),
                                                       y= pi[,i] %>% lagger(lag=k) %>% 
                                                         names(.) %>% first())
-                                ) %>% summary() %>% coef()
+                                ) #%>% summary() %>% coef()
   cat('\n')
   print(paste0(inflation$names[[i]],',  ', k, ' exogenously defined lags'))
-  print(inflation[['ark']][[i]])
+  print(summary(inflation[['ark']][[i]]))
   
   ##### AR regression with optimal lags #####
   if (flag___optilag==1){
     inflation[['aroptilm']][[i]] <- rolloop(df = pi[,i], window = wind, lags = inflation[['aropti']][[i]])
-    
+
     inflation[['plot_aropti']][[i]] <- ggplot(data=inflation[['aroptilm']][[i]],
                                               aes(x=index(inflation[['aroptilm']][[i]]),
                                                   y=inflation[['aroptilm']][[i]][,r]))+
@@ -131,13 +131,13 @@ for (i in 1:n){
       geom_line(aes(y=1), colour='black', size=.8)+
       # plot makeup
       geom_smooth(method='loess', colour='blue')+scale_x_yearqtr(format='%Y Q%q', n=20)+theme_bw()+
-      scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) + 
+      scale_y_continuous()+xlab(' ') + ylab(paste0('AR(',r,') coeff. estimates')) +
       ggtitle(paste0(inflation$names[[i]],' - ', inflation[['aropti']][[i]], ' optimal lags'))
-    
+
     if  (flag___plot==0) plot(inflation[['plot_aropti']][[i]])
-    
+
     # saves graphs in proper directory with names
-    ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]], 
+    ggsave(paste0('AR(',r,') coeff. estimates ', inflation[['names']][[i]],
                   ' - ', inflation[['aropti']][[i]], ' optimal lags.pdf'),
            inflation[['plot_aropti']][[i]],
            device='pdf',
@@ -186,6 +186,9 @@ for (i in 1:n){
   # stopping printing
   sink()
 }
+
+# plot twist: partial autocorrelation functions over rolling windows
+# but how to plot or synthetize? all this? ggridges?
 
 
 ##### Housekeeping ####

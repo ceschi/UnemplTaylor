@@ -13,7 +13,9 @@ Highly automated, this set of scripts downloads, assembles macroeconomic time se
 	+ switch to javaless xlsx import
 	+ ~~automate to Pi via chron~~
 	+ re-script USreg to output regs of interest-> switch to lapply
-	+ extend regressions$formula
-	+ possibly add bootstrapping
+	+ extend regressions$formula and regressions$models to accommodate three splits
+	+ ~~possibly add bootstrapping~~ -- no: it crashes outcorr?
+	+ fork a version with static date so to have more stable estimates: mid august 2018
+
 	
 	

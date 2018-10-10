@@ -59,8 +59,7 @@ source('USreg.R', verbose=F, echo=F)
 # exogenous lag
 # ideally cycling through different values
 # like 1 3 5
-k=1
-
+k=5
 
 # selector for coefficient
 # AR(r) will be plotted
@@ -70,7 +69,7 @@ r=1
 # select window width for
 # rolling estimates, pick <80
 # to get interesting results
-wind=58
+wind=14*4
 
 source('inflanalysis.R')
 

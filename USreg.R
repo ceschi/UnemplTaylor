@@ -28,7 +28,8 @@ regressions <- list(
   ),
   mswm=list(
     fit=list(),
-    coefs=list()
+    coefs=list(),
+    convse=list()
   ),
   var=list(
     varfit=list(),
@@ -58,27 +59,35 @@ regressions$formula <- list(
   # 7
     tr_spf_mean = ffr ~ spf_cpi_h1_mean + realtime_gap + ffrb,
   # 8
-    tr_spf_uncert = ffr ~ deflt1 + realtime_gap + ffrb + spf_cpi_h1_iqr
+    tr_spf_uncert = ffr ~ deflt1 + realtime_gap + ffrb + spf_cpi_h1_iqr,
+  # 9
+    tr_debt_g = ffr ~ deflt1 + realtime_gap + ffrb + debt_growth,
+  # 10
+    tr_surplus = ffr ~ deflt1 + realtime_gap + ffrb + surplus_gdp
     )
 
 # Strings to indentify models 
 regressions$messages <- list(
   # 1
-  'Standard TR',
+  '1 - Standard TR',
   # 2
-  'TR with layoffs replacing output gap',
+  '2 - TR with layoffs replacing output gap',
   # 3 
-  'TR and BAA spread',
+  '3 - TR and BAA spread',
   # 4
-  'TR and 3M spread',
+  '4 - TR and 3M spread',
   # 5
-  'TR with layoffs and 3M spread',
+  '5 - TR with layoffs and 3M spread',
   # 6
-  'TR with layoffs and BAA spread',
+  '6 - TR with layoffs and BAA spread',
   # 7
-  'TR with SPF mean expected inflation',
+  '7 - TR with SPF mean expected inflation',
   # 8
-  'TR augmented with IQR SPF'
+  '8 - TR augmented with IQR SPF',
+  # 9
+  '9 - TR with debt growth',
+  # 10
+  '10 - TR with surplus'
 )
 
 ### Looping over different specifications
@@ -87,9 +96,11 @@ for (m in 1:length(regressions$formula)){
   
   ##### Simple OLS with stability checks #####
 
+  # lapply
   # fit a linear model
   regressions$models[[m]] <- lm(data=db_US, regressions$formula[[m]])
   
+  # lapply
   # rescale parameters
   regressions$params[[m]] <- repara(regressions$models[[m]])
   
@@ -103,12 +114,13 @@ for (m in 1:length(regressions$formula)){
     geom_hline(color='red', yintercept=regressions$models[[m]] %>% residuals() %>% sd() %>% `*`(-2))+
     xlab(' ') + ylab('Residuals') + ggtitle(regressions$messages[[m]])
   
-  ggsave(paste0(regressions$messages[[m]],'.pdf'),
+  ggsave(paste0(regressions$messages[[m]],' residuals.pdf'),
     regressions$plot[[m]], 
     device='pdf', 
     graphs_dir,
     height=8, width=14.16, units='in')
   
+  # lapply
   # stability checks on OLS
   # CUSUM
   regressions$stab$cusum[[m]]<- efp(formula=regressions$formula[[m]], data=as.data.frame(db_US), type='OLS-CUSUM')
@@ -138,8 +150,14 @@ for (m in 1:length(regressions$formula)){
                                           k=j,
                                           sw=rep(T, 1+regressions$formula[[m]] %>% all.vars() %>% length())
                                           )
-      regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
       
+      # Delta coefs + replace correct \rhohat
+      regressions$mswm$coefs[[m]] <- regressions$mswm$fit[[m]]@Coef/(1-regressions$mswm$fit[[m]]@Coef[,4])
+      regressions$mswm$coefs[[m]][,4] <- regressions$mswm$fit[[m]]@Coef[,4]
+      
+      # Delta SE + add correct SE for \rho
+      regressions$mswm$convse[[m]] <- regressions$mswm$fit[[m]]@seCoef/(1-regressions$mswm$fit[[m]]@Coef[,4])
+      regressions$mswm$convse[[m]][,4] <- regressions$mswm$fit[[m]]@seCoef[,4]
   }
   
   ##### VAR #####

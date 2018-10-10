@@ -67,6 +67,9 @@ reg_call <- function(m){
   # the output while printing it out
   # on the command line
   
+  # first, stops older sink
+  # sink(file = NULL)
+  
   sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regressions results.txt'),
        append=F,
        split=T,
@@ -75,14 +78,16 @@ reg_call <- function(m){
   sa_plot <- function(po){
     # custum function to duplicate, save as pdf 
     # and shut second graphic device
-    dev.copy(pdf, po, height=8, width=14.6)
+    dev.copy(pdf, po, height=8/1.5, width=14.6/1.5)
     invisible(dev.off())
+    # set height=8/1.5 and width=14.6/1.5
+    # for LaTeX readable plots
     
   }
   
   
   # prints the name of the model
-  cat(paste0('\n\n', as.character(regressions$messages[[m]]), '\n'))
+  cat(paste0(as.character(regressions$messages[[m]]), '\n'))
   
   # prints the estimated formula
   cat('\n')
@@ -111,7 +116,8 @@ reg_call <- function(m){
   sa_plot(paste0(file.path(graphs_dir, regressions$messages[[m]]), ' F-stat.pdf'))
   
   # prints date of most likely break
-  cat(paste0('\nMost likely singular break occurs at ',
+  cat('\n\n\n')
+  cat(paste0('Most likely singular break occurs at ',
              as.character(regressions$stab$fstatpoints[[m]]), '\n'))
   regressions$stab$fstatcandidates[[m]]
   
@@ -130,11 +136,13 @@ reg_call <- function(m){
   
   # MSwM printig results and plotting
   if (flag___msm!=0){
-    cat('\n\nMarkov Switching model estimation with', j, 'states')
+    cat('\n\n\nMarkov Switching model estimation with', j, 'states')
     cat('\n')
     cat(summary(regressions$mswm$fit[[m]]))
     cat('\n\nConverted parameters:\n')
     print(regressions$mswm$coefs[[m]])
+    cat('\nConverted standard errors:\n')
+    print(regressions$mswm$convse[[m]])
     
     # fine tuning plots
     par(mar=c(1,1,2.85,1), cex.main=.85)
@@ -149,6 +157,7 @@ reg_call <- function(m){
   
   # VAR results for TR equation
   # this does ignore all other results
+  cat('\n\n\n')
   print(summary(regressions$var$varfit[[m]], equation='ffr'))
   
   # plots and saves IRFs
@@ -158,16 +167,20 @@ reg_call <- function(m){
   
   # SVAR results restricted to TR
   # thus dropping other eq'ns
+  cat('\n\n\n')
   print(summary(regressions$svar$svarfit[[m]], equation='ffr'))
   
   # plots and save SVAR IRFs
   plot(regressions$svar$svarirf[[m]])
   title(paste0(regressions$messages[[m]], ' SVAR IRFs, MonPol shock'), line=9.5)
   sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' SVAR model IRFs.pdf')))
+  
+  # end spacing
+  cat('\n\n\n\n')
       
   
   
-  # stopping printing
+  # stopp printing
   sink(file=NULL)
 }
 
