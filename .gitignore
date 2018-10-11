@@ -7,6 +7,7 @@
 *.xlsx
 *.xls
 *.txt
+*.Rproj
 
 # Session Data files
 .RData
