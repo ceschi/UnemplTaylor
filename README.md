@@ -3,10 +3,10 @@
 Set of scripts previously employed to estimate several specifications of the Fed's monetary policy rule across a variety of econometric methods with post-war data. These scripts are now included in another repository and integrated in more general routines. Therefore, this repository will be modified to host routines automating data collection, cleaning, assembling, posting, and reporting.
 
 #### Todo list
-	+ strip off the unnecessary scripts
-	+ extend variables included in the DB
-	+ reduce econometrics to what's essential
-	+ improve speed with vectorisation where possible
+	* strip off the unnecessary scripts
+	* extend variables included in the DB
+	* reduce econometrics to what's essential
+	* improve speed with vectorisation where possible
 
 
 
