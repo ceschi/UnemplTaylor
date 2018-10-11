@@ -1,4 +1,4 @@
-##### Specifically designed functions ####
+  ##### Specifically designed functions ####
 
 # A file to gather all home made functions with relative descriptions
 
@@ -30,7 +30,7 @@ instant_pkgs <- function(pkgs) {
   need_to_attach <- pkgs[which(!pkgs %in% gsub("package:", "", attached_pkgs))]
   
   if (length(need_to_attach) > 0) {
-    for (i in 1:length(need_to_attach)) require(need_to_attach[i], character.only = TRUE)
+    for (i in 1:length(need_to_attach))  suppressPackageStartupMessages(library(need_to_attach[i], character.only = TRUE))
   }
   
   if (length(need_to_attach) == 0) {
@@ -39,150 +39,6 @@ instant_pkgs <- function(pkgs) {
 }
 
 
-
-reg_call <- function(m){
-  # custom function to extract, print and plot 
-  # information on estimates of a particular
-  # Taylor rule specification. The latter is selected
-  # by specifying m, listed below
-  
-  # # 1
-  # 'Standard TR',
-  # # 2
-  # 'TR with layoffs replacing output gap',
-  # # 3 
-  # 'TR and BAA spread',
-  # # 4
-  # 'TR and 3M spread',
-  # # 5
-  # 'TR with layoffs and 3M spread',
-  # # 6
-  # 'TR with layoffs and BAA spread',
-  # # 7
-  # 'TR with SPF mean expected inflation',
-  # # 8
-  # 'TR augmented with IQR SPF'
-  
-  # sink fnct saves in a txt file
-  # the output while printing it out
-  # on the command line
-  
-  # first, stops older sink
-  # sink(file = NULL)
-  
-  sink(file=paste0(file.path(graphs_dir, regressions$messages[[m]]), ' regressions results.txt'),
-       append=F,
-       split=T,
-       type='output')
-  
-  sa_plot <- function(po){
-    # custum function to duplicate, save as pdf 
-    # and shut second graphic device
-    dev.copy(pdf, po, height=8/1.5, width=14.6/1.5)
-    invisible(dev.off())
-    # set height=8/1.5 and width=14.6/1.5
-    # for LaTeX readable plots
-    
-  }
-  
-  
-  # prints the name of the model
-  cat(paste0(as.character(regressions$messages[[m]]), '\n'))
-  
-  # prints the estimated formula
-  cat('\n')
-  print(regressions$formula[[m]])
-  cat('\n')
-  
-  # prints the number of observations used in the model
-  cat(paste0('\nModel estimated with ', nobs(regressions$models[[m]]), ' observations\n\n'))
-  
-  # prints converted parameters + SE
-  print(regressions$params[[m]])
-
-  # plots the residuals + SE bands for stability
-  print(regressions$plot[[m]])
-
-  # plots cusum stability diagnostics
-  plot(regressions$stab$cusum[[m]], alpha=.01, boundary=T)
-  sa_plot(paste0(file.path(graphs_dir, regressions$messages[[m]]), ' CUSUM.pdf'))
-  
-  # plots Fstat stability diagnostics
-  plot(regressions$stab$fstat[[m]])
-  title(main=paste0(regressions$messages[[m]], ': F-stat stability'),
-        sub=paste0('Vertical line indicates date of most likely break: ', 
-                   regressions$stab$fstatpoints[[m]]))
-  lines(breakpoints(regressions$stab$fstat[[m]]))
-  sa_plot(paste0(file.path(graphs_dir, regressions$messages[[m]]), ' F-stat.pdf'))
-  
-  # prints date of most likely break
-  cat('\n\n\n')
-  cat(paste0('Most likely singular break occurs at ',
-             as.character(regressions$stab$fstatpoints[[m]]), '\n'))
-  regressions$stab$fstatcandidates[[m]]
-  
-  # optimal number of segment partition,
-  # -1 to account for the 0-breaks case
-  fstat_dates <- which(summary(regressions$stab$fstatcandidates[[m]])$RSS[2,]==
-                         min(summary(regressions$stab$fstatcandidates[[m]])$RSS[2,]), arr.ind=T)-1
-  
-  # extracting corresponding nobs and dates
-  n_obs <- summary(regressions$stab$fstatcandidates[[m]])$breakpoints[fstat_dates,] %>% na.omit(.)
-  multibreaks <- names(regressions$stab$fstatcandidates[[m]]$y)[n_obs] %>% paste(collapse=', ')
-  
-  # printing optimal segment partition dates
-  cat(paste0('while optimal segmentation points to ', length(n_obs), ' breaks, at dates ', multibreaks))
-  
-  
-  # MSwM printig results and plotting
-  if (flag___msm!=0){
-    cat('\n\n\nMarkov Switching model estimation with', j, 'states')
-    cat('\n')
-    cat(summary(regressions$mswm$fit[[m]]))
-    cat('\n\nConverted parameters:\n')
-    print(regressions$mswm$coefs[[m]])
-    cat('\nConverted standard errors:\n')
-    print(regressions$mswm$convse[[m]])
-    
-    # fine tuning plots
-    par(mar=c(1,1,2.85,1), cex.main=.85)
-    plotProb(regressions$mswm$fit[[m]], which=2)
-    title(paste0(j, '-state MS regimes for ', regressions$messages[[m]]), line=2.3)
-    sa_plot(file.path(graphs_dir,paste0(regressions$messages[[m]], ' ',
-                      j,'-state MSM.pdf')))
-    
-    # silently setting margins to default values
-    invisible(dev.off())
-  }
-  
-  # VAR results for TR equation
-  # this does ignore all other results
-  cat('\n\n\n')
-  print(summary(regressions$var$varfit[[m]], equation='ffr'))
-  
-  # plots and saves IRFs
-  plot(regressions$var$varirf[[m]])
-  title(paste0(regressions$messages[[m]], ' VAR IRFs, MonPol shock'), line=9.5)
-  sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' VAR model IRFs.pdf')))
-  
-  # SVAR results restricted to TR
-  # thus dropping other eq'ns
-  cat('\n\n\n')
-  print(summary(regressions$svar$svarfit[[m]], equation='ffr'))
-  
-  # plots and save SVAR IRFs
-  plot(regressions$svar$svarirf[[m]])
-  title(paste0(regressions$messages[[m]], ' SVAR IRFs, MonPol shock'), line=9.5)
-  sa_plot(file.path(graphs_dir, paste0(regressions$messages[[m]], ' SVAR model IRFs.pdf')))
-  
-  # end spacing
-  cat('\n\n\n\n')
-      
-  
-  
-  # stopp printing
-  sink(file=NULL)
-}
 
 rollm <- function(df, formula){
   # function to extract and store coefficients 
@@ -318,29 +174,6 @@ trendev<-function(mat){
 }
 
 
-lagger <- function(series, lag, na.cut=F){
-  # Takes a time series and creates a matrix with given number
-  # of lags, also generating appropriate names
-  
-  
-  matrix <- as.data.frame(matrix(ncol=lag+1, nrow=nrow(series)))
-  for (i in 1:lag+1){
-    matrix[,i] <- stats::lag(series, k=(i-1))
-  }
-  names(matrix) <- c(names(series), paste(names(series), 1:lag, sep='.'))
-  matrix[, 1] <- series
-  matrix <- as.xts(matrix, order.by=index(series))
-  
-  # conditional to remove NAs from output
-  if (na.cut){
-    matrix <- na.omit(matrix)
-  }
-  
-  # output
-  return(matrix)
-}
-
-
 formula.maker <- function(df, y){
   # provided with a df and a dependent variable name
   # this generates a formula for estimation in R, y is the 
@@ -426,150 +259,31 @@ spf_funct <-  function(filnam, typs, ahead=1) {
 }
 
 
-# modified DF function to extract optimal lags from URCA pkg FAILURE
-#########
-# urca.df <- function (y, type = c("none", "drift", "trend"), lags = 1, selectlags = c("Fixed", "AIC", "BIC")) 
-# {
-#   selectlags <- match.arg(selectlags)
-#   type <- match.arg(type)
-#   if (ncol(as.matrix(y)) > 1) 
-#     stop("\ny is not a vector or univariate time series.\n")
-#   if (any(is.na(y))) 
-#     stop("\nNAs in y.\n")
-#   y <- as.vector(y)
-#   lag <- as.integer(lags)
-#   if (lag < 0) 
-#     stop("\nLags must be set to an non negative integer value.\n")
-#   CALL <- match.call()
-#   DNAME <- deparse(substitute(y))
-#   x.name <- deparse(substitute(y))
-#   lags <- lags + 1
-#   z <- diff(y)
-#   n <- length(z)
-#   x <- embed(z, lags)
-#   z.diff <- x[, 1]
-#   z.lag.1 <- y[lags:n]
-#   tt <- lags:n
-#   
-#   if (selectlags != "Fixed") {
-#     critRes <- rep(NA, lags)
-#     for (i in 2:(lags)) {
-#       z.diff.lag = x[, 2:i]
-#       if (type == "none") 
-#         result <- lm(z.diff ~ z.lag.1 - 1 + z.diff.lag)
-#       if (type == "drift") 
-#         result <- lm(z.diff ~ z.lag.1 + 1 + z.diff.lag)
-#       if (type == "trend") 
-#         result <- lm(z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
-#       critRes[i] <- AIC(result, k = switch(selectlags, 
-#                                            AIC = 2, BIC = log(length(z.diff))))
-#     }
-#     lags <- optimaxlags <- which.min(critRes)
-#     
-#   }
-#   z.diff.lag = x[, 2:lags]
-#   if (type == "none") {
-#     result <- lm(z.diff ~ z.lag.1 - 1 + z.diff.lag)
-#     tau <- coef(summary(result))[1, 3]
-#     teststat <- as.matrix(tau)
-#     colnames(teststat) <- "tau1"
-#   }
-#   if (type == "drift") {
-#     result <- lm(z.diff ~ z.lag.1 + 1 + z.diff.lag)
-#     tau <- coef(summary(result))[2, 3]
-#     phi1.reg <- lm(z.diff ~ -1 + z.diff.lag)
-#     phi1 <- anova(phi1.reg, result)$F[2]
-#     teststat <- as.matrix(t(c(tau, phi1)))
-#     colnames(teststat) <- c("tau2", "phi1")
-#   }
-#   if (type == "trend") {
-#     result <- lm(z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
-#     tau <- coef(summary(result))[2, 3]
-#     phi2.reg <- lm(z.diff ~ -1 + z.diff.lag)
-#     phi3.reg <- lm(z.diff ~ z.diff.lag)
-#     phi2 <- anova(phi2.reg, result)$F[2]
-#     phi3 <- anova(phi3.reg, result)$F[2]
-#     teststat <- as.matrix(t(c(tau, phi2, phi3)))
-#     colnames(teststat) <- c("tau3", "phi2", "phi3")
-#   }
-#   
-#   rownames(teststat) <- "statistic"
-#   testreg <- summary(result)
-#   res <- residuals(testreg)
-#   if (n < 25) 
-#     rowselec <- 1
-#   if (25 <= n & n < 50) 
-#     rowselec <- 2
-#   if (50 <= n & n < 100) 
-#     rowselec <- 3
-#   if (100 <= n & n < 250) 
-#     rowselec <- 4
-#   if (250 <= n & n < 500) 
-#     rowselec <- 5
-#   if (n >= 500) 
-#     rowselec <- 6
-#   if (type == "none") {
-#     cval.tau1 <- rbind(c(-2.66, -1.95, -1.6), c(-2.62, -1.95, 
-#                                                 -1.61), c(-2.6, -1.95, -1.61), c(-2.58, -1.95, -1.62), 
-#                        c(-2.58, -1.95, -1.62), c(-2.58, -1.95, -1.62))
-#     cvals <- t(cval.tau1[rowselec, ])
-#     testnames <- "tau1"
-#   }
-#   if (type == "drift") {
-#     cval.tau2 <- rbind(c(-3.75, -3, -2.63), c(-3.58, -2.93, 
-#                                               -2.6), c(-3.51, -2.89, -2.58), c(-3.46, -2.88, -2.57), 
-#                        c(-3.44, -2.87, -2.57), c(-3.43, -2.86, -2.57))
-#     cval.phi1 <- rbind(c(7.88, 5.18, 4.12), c(7.06, 4.86, 
-#                                               3.94), c(6.7, 4.71, 3.86), c(6.52, 4.63, 3.81), 
-#                        c(6.47, 4.61, 3.79), c(6.43, 4.59, 3.78))
-#     cvals <- rbind(cval.tau2[rowselec, ], cval.phi1[rowselec, 
-#                                                     ])
-#     testnames <- c("tau2", "phi1")
-#   }
-#   if (type == "trend") {
-#     cval.tau3 <- rbind(c(-4.38, -3.6, -3.24), c(-4.15, -3.5, 
-#                                                 -3.18), c(-4.04, -3.45, -3.15), c(-3.99, -3.43, 
-#                                                                                   -3.13), c(-3.98, -3.42, -3.13), c(-3.96, -3.41, 
-#                                                                                                                     -3.12))
-#     cval.phi2 <- rbind(c(8.21, 5.68, 4.67), c(7.02, 5.13, 
-#                                               4.31), c(6.5, 4.88, 4.16), c(6.22, 4.75, 4.07), 
-#                        c(6.15, 4.71, 4.05), c(6.09, 4.68, 4.03))
-#     cval.phi3 <- rbind(c(10.61, 7.24, 5.91), c(9.31, 6.73, 
-#                                                5.61), c(8.73, 6.49, 5.47), c(8.43, 6.49, 5.47), 
-#                        c(8.34, 6.3, 5.36), c(8.27, 6.25, 5.34))
-#     cvals <- rbind(cval.tau3[rowselec, ], cval.phi2[rowselec, 
-#                                                     ], cval.phi3[rowselec, ])
-#     testnames <- c("tau3", "phi2", "phi3")
-#   }
-#   colnames(cvals) <- c("1pct", "5pct", "10pct")
-#   rownames(cvals) <- testnames
-#   new("ur.df", y = y, model = type, cval = cvals, lags = lag, optilags = optimaxlags,
-#       teststat = teststat, testreg = testreg, res = res, test.name = "Augmented Dickey-Fuller Test")
-# }
-
-
-
-
-
-
-
-
 ##### Packages Loader #####
 
-pkgs <- c('vars', 'glue', 'MSwM', 'lazyeval',
-          'quantreg', 'tidyverse', 'devtools',
-          'tseries', 'dynlm', 'stargazer',
-          'dyn', 'strucchange', 'xts',
-          'MASS', 'car', 'rvest',
-          'mFilter', 'fredr',
-          'readr', 'quantmod',
-          'devtools', 'lubridate',
-          'readxl', 'VARsignR', 'tbl2xts')
+pkgs <- c('glue', 
+          'lazyeval',
+          'quantreg', 
+          'tidyverse',
+          'devtools',
+          'tseries',
+          'stargazer',
+          'xts',
+          'MASS',
+          'car',
+          'rvest',
+          'mFilter',
+          'fredr',
+          'readr',
+          'quantmod',
+          'devtools',
+          'lubridate',
+          'readxl',
+          'tbl2xts',
+          'tictoc')
 # fill pkgs with names of the packages to install
 
 devtools::install_github('sboysel/fredr')
-devtools::install_github('ceschi/urcabis')
-#library(urcabis)
 
 instant_pkgs(pkgs)
 
