@@ -146,44 +146,6 @@ names(rev_hist) <-  c('rev_cpi', 'rev_cpi_fe', 'rev_defl',
                       'rev_pce', 'rev_pce_fe')
 
 
-#### ERROR GENERATING CODE #### 
-### commented out bcs it does not merge
-### issue with NA's in indexes 
-
-
-# tsconverter <- function(df, index){
-#   temp <- as.Date(as.yearqtr(df$index, format='%Y.%q'))
-#   df$index <- temp
-#   df <- xts(df, order.by = df$index)
-#   # df$index <- NULL
-#   return(df)
-# }
-# 
-# cpi$date <- as.Date(as.yearqtr(cpi$date, format='%Y.%q'))
-# cpi.mean$date <- as.yearqtr(cpi.mean$date, format='%Y.%q')
-# 
-# core$date <- as.Date(as.yearqtr(core$date, format='%Y.%q'))
-# core.mean$date <- as.yearqtr(core.mean$date, format='%Y.%q')
-# 
-# defl$date <- as.Date(as.yearqtr(defl$date, format='%Y.%q'))
-# defl.mean$date <- as.yearqtr(defl.mean$date, format='%Y.%q')
-# 
-# cpi <- xts(cpi, order.by=cpi$date)
-# cpi.mean <- xts(cpi.mean, order.by=cpi.mean$date)
-# # cpi$date <- NULL
-# # cpi.mean$date <- NULL
-# 
-# core <- xts(core, order.by=core$date)
-# core.mean <- xts(core.mean, order.by=core.mean$date)
-# # core$date <- NULL
-# # core.mean$date <- NULL
-# 
-# defl <- xts(defl, order.by=defl$date)
-# defl.mean <- xts(defl.mean, order.by=defl.mean$date)
-# # defl$date <- NULL
-# # defl.mean$date <- NULL
-
-
 ## UNEMPLOYMENT METRICS ####
 
 claims <- fredr_series_observations(series_id='ICSA', frequency='q', aggregation_method='sum') %>% tbl_xts()
@@ -266,23 +228,6 @@ tbill_rate_10y <- fredr_series_observations(series_id='DGS10',frequency='q') %>%
 tbill3_ffr <- fredr_series_observations(series_id='TB3SMFFM', frequency='q', aggregation_method='eop') %>% tbl_xts()
 
 
-## Scraping Yahoo! Finance
-
-# # determine current date, adapt the Yahoo! URL
-# sp_ret <- read_csv(paste0('http://chart.finance.yahoo.com/table.csv?s=^GSPC&a=0&b=3&c=1950&d=',
-#                           as.numeric(format(Sys.Date(), '%m')), 
-#                           '&e=', as.numeric(format(Sys.Date(), '%d')), 
-#                           '&f=', as.numeric(format(Sys.Date(), '%Y')), 
-#                           '&g=m&ignore=.csv'),
-#                    col_names=T, col_types = cols(
-#                      Date = col_date(format = "%Y-%m-%d"),
-#                      Open = col_double(),
-#                      High = col_double(),
-#                      Low = col_double(),
-#                      Close = col_double(),
-#                      Volume = col_double(),
-#                      `Adj Close` = col_double()
-#                    ))
 
 options("getSymbols.warning4.0"=FALSE)
 options("getSymbols.yahoo.warning"=FALSE)# disables disclaimer about version update
