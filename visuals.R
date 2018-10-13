@@ -8,7 +8,9 @@ if (flag___singular==1) library(ggplot2, xts)
 # scale for LaTeX plots
 # /1 to have bigger ones
 # good for nontext vis
-pdf_width = 14.6/1.5; pdf_height = 8/1.5
+
+invsc <- 1.5
+pdf_width = 14.6/invsc; pdf_height = 8/invsc
 
 
 # TR variables
@@ -69,7 +71,7 @@ plot_slack <- ggplot(db_US["1945/"], aes(x=index(db_US["1945/"])))+
 if (flag___plot==0) print(plot_slack)
 
 ggsave(plot = plot_slack,
-       filename='output slack.pdf',
+       filename='output_slack.pdf',
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
@@ -89,7 +91,7 @@ plot_nowinf <- ggplot(db_US["1965/"], aes(x=index(db_US["1965/"])))+
 if (flag___plot==0) print(plot_nowinf)
 
 ggsave(plot = plot_nowinf,
-       filename='inflation nowcast.pdf',
+       filename='inflation_nowcast.pdf',
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
@@ -107,7 +109,7 @@ plot_hinf <- ggplot(db_US["1965/"], aes(x=index(db_US["1965/"])))+
 if (flag___plot==0) print(plot_hinf)
 
 ggsave(plot = plot_hinf,
-       filename='inflation forecasts.pdf',
+       filename='inflation_forecasts.pdf',
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
@@ -126,7 +128,7 @@ plot_spf_fore <- ggplot(db_US["1980/"], aes(x=index(db_US["1980/"])))+
 if (flag___plot==0) print(plot_spf_fore)
 
 ggsave(plot = plot_spf_fore,
-       filename='SPF inf forecasts.pdf',
+       filename='SPF_inf_forecasts.pdf',
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
@@ -145,7 +147,7 @@ plot_spf_iqr <- ggplot(db_US["1980/"], aes(x=index(db_US["1980/"])))+
 if (flag___plot==0) print(plot_spf_iqr)
 
 ggsave(plot = plot_spf_iqr,
-       filename='disagreement inf forecasts.pdf',
+       filename='disagreement_inf_forecasts.pdf',
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
@@ -209,7 +211,7 @@ rm(plot_trvars,
    plot_spf_fore,
    plot_money,
    plot_spf_iqr,
-   plot_spread,m,
+   plot_spread,
    pdf_height,
    pdf_width
    )
