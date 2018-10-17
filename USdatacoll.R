@@ -1,9 +1,3 @@
-#### Second venue of research
-#### using unemployment metrics to proxy output gap ####
-
-# side goal: integrate smoothly this with previous codes
-# for US (Trulyfinal.R) and for the panel building
-
 # This code collects and scraps core data for the analysis
 # and puts it in xts format
 
@@ -209,6 +203,12 @@ gap_output <- merge(y_real_gap, gap_expost)
 names(gap_output) <- c('realtime_gap', 'expost_gap')
                       # philly and st louis gaps, respectively
 options(warn=0) # reactivates warnings
+
+##### Consumption #####
+# work in progress
+# real_cons_exp = fredr_series_observations(series_id = 'PCECC96', frequency = 'q')
+
+
 
 
 ##### SPREADS ####
