@@ -1,0 +1,127 @@
+% !TeX spellcheck = en_GB
+\documentclass{beamer}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{dsfont} 
+\usepackage{amssymb}
+\usepackage[colorlinks=true, linkcolor=blue, bookmarks=false, citecolor=red, urlcolor=blue]{hyperref}
+\hypersetup{pdfstartview=FitH}
+\usepackage[super]{nth} %automatic -th for dates
+\usepackage{lipsum} %filler
+\usepackage{fullpage} %margins 
+\usepackage[affil-it]{authblk} %affiliation package
+
+% rotating pages for big tables
+\usepackage{pdflscape}
+
+% floating obj (img, tbl)
+\usepackage{float}
+
+\mode<presentation>
+{
+	\usetheme{CambridgeUS}
+	\setbeamertemplate{itemize items}[default]
+	%\setbeameroption{show notes on second screen}
+	\setbeamertemplate{enumerate items}[default]
+	\usecolortheme{default}
+	\usefonttheme{serif} 
+	\setbeamertemplate{navigation symbols}{}
+	\setbeamertemplate{}[numbered]
+}
+
+
+\title{US Economy data}
+\author[1]{\href{mailto:emanuele.franceschi@psemail.eu}{Emanuele Franceschi}}
+
+
+\date{\today}
+\affil[1]{PSE - Paris School of Economics, Université Paris 1 Panthéon-Sorbonne}
+
+
+
+\begin{document}
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\maketitle
+\end{frame}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\section{Real economy}
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/output_slack}
+	\caption{Measures of output slack}
+\end{figure}
+\end{frame}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\section{Inflation, money, finance}
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/rev_infl}
+	\caption{Revised measures of inflation}
+\end{figure}
+\end{frame}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/inflation_nowcast}
+	\caption{Inflation nowcast}
+\end{figure}
+\end{frame}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/inflation_forecast}
+	\caption{Inflation forecast}
+\end{figure}
+\end{frame}
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/spreads}
+	\caption{Spreads}
+\end{figure}
+\end{frame}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/money}
+	\caption{Money aggregates}
+\end{figure}
+
+
+\section{Survey of Professional Forecasters}
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/SPF_infl_forecasts}
+	\caption{SPF inflation forecast}
+\end{figure}
+\end{frame}
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
+\begin{figure}
+	\centering
+	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/disagreement_inf_forecasts}
+	\caption{Disagreement in SPF forecasts}
+\end{figure}
+\end{frame}
+
+\end{document}
