@@ -9,7 +9,6 @@
 \usepackage{amssymb}
 \usepackage[super]{nth} %automatic -th for dates
 \usepackage{lipsum} %filler
-\usepackage{fullpage} %margins 
 \usepackage[affil-it]{authblk} %affiliation package
 
 % rotating pages for big tables
@@ -32,18 +31,18 @@
 
 
 \title{US Economy data}
-\author[1]{\href{mailto:emanuele.franceschi@psemail.eu}{Emanuele Franceschi}}
+\author{\href{mailto:emanuele.franceschi@psemail.eu}{Emanuele Franceschi}}
 
 
 \date{\today}
-\affil[1]{PSE - Paris School of Economics, Université Paris 1 Panthéon-Sorbonne}
+\affil{PSE - Paris School of Economics, Université Paris 1 Panthéon-Sorbonne}
 
 
 
 \begin{document}
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
-\begin{frame}
-\maketitle
+\begin{frame}[plain]
+\titlepage
 \end{frame}
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -95,12 +94,13 @@
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
+\begin{frame}
 \begin{figure}
 	\centering
 	\includegraphics[keepaspectratio,width=\textwidth]{../Plots/money}
 	\caption{Money aggregates}
 \end{figure}
-
+\end{frame}
 
 \section{Survey of Professional Forecasters}
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %

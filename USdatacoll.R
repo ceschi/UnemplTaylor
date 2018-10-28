@@ -160,14 +160,14 @@ tot_emp <- fredr_series_observations(series_id='PAYEMS', frequency='q') %>% tbl_
 
 ## Unemployment manipulation
 
-# short_long_diff <- natural_unemp_short - natural_unemp_long
+short_long_diff <- natural_unemp_short - natural_unemp_long
 layoffs <- 100*claims/tot_emp
 employment_fluct <- current_unemp - natural_unemp_long
 
 ## merging
 
-unemployment <- merge(layoffs, employment_fluct)
-names(unemployment) <- c('layoffs', 'employment_fluct')
+unemployment <- merge(layoffs, employment_fluct, current_unemp, short_long_diff)
+names(unemployment) <- c('layoffs', 'employment_fluct', 'unempl_rate', 'unemp_sh_lng')
 
 
 #### OUTPUT GAPS ####
@@ -206,7 +206,38 @@ options(warn=0) # reactivates warnings
 
 ##### Consumption #####
 # work in progress
-# real_cons_exp = fredr_series_observations(series_id = 'PCECC96', frequency = 'q')
+# real_cons_exp <-  fredr_series_observations(series_id = 'PCECC96', frequency = 'q') %>% 
+
+###### List of additional series ########
+# mnemonics	desc
+# PCECC96	Real personal consumption expenditures
+# PCEDG	personal consumption expenditures, durable goods
+# PCND	personal consumption expenditures, non durable goods
+# PCESV	personal consumption expenditures, services
+# DPCCRC1M027SBEA	personal consumption expenditures ex food and energy
+# GCEC1	Real Government Consumption Expenditures and Gross Investment
+# FDEFX	Federal Government: National Defense Consumption Expenditures and Gross Investment
+# GPDI	Gross Private Domestic Investment
+# GPDIC1	Real Gross Private Domestic Investment
+# PNFI	Private Nonresidential Fixed Investment
+# PRFI	Private Residential Fixed Investment
+# DRSFRMACBS	Delinquency Rate on Single-Family Residential Mortgages, Booked in Domestic Offices, All Commercial Banks
+# EMRATIO	Civilian Employment-Population Ratio
+# PAYEMS	All Employees: Total Nonfarm Payrolls
+# CES0500000003	Average Hourly Earnings of All Employees: Total Private
+# CE16OV	Civilian Employment Level
+# LREM25TTUSQ156S	Employment Rate: Aged 25-54: All Persons for the United States
+# CES9091000001	All Employees: Government: Federal
+# LNS12300060	Employment Population Ratio: 25 - 54 years
+# U6RATE	Total unemployed, plus all marginally attached workers plus total employed part time for economic reasons
+# UEMPMEAN	Average (Mean) Duration of Unemployment
+# AWHNONAG	Average Weekly Hours of Production and Nonsupervisory Employees: Total private
+# AWHMAN	Average Weekly Hours of Production and Nonsupervisory Employees: Manufacturing
+# CES0600000007	Average Weekly Hours of Production and Nonsupervisory Employees: Goods-Producing 
+# CES4300000007	Average Weekly Hours of Production and Nonsupervisory Employees: Transportation and Warehousing
+# CEU4200000007	Average Weekly Hours of Production and Nonsupervisory Employees: Retail Trade
+# CES4200000007	Average Weekly Hours of Production and Nonsupervisory Employees: Retail Trade  seasonally adj
+# CEU3100000007	Average Weekly Hours of Production and Nonsupervisory Employees: Durable Goods
 
 
 

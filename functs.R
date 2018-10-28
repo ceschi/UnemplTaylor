@@ -259,6 +259,80 @@ spf_funct <-  function(filnam, typs, ahead=1) {
 }
 
 
+hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
+  
+  # test code 
+  # 
+  # tseries <- c(rep(NA, 2), rnorm(200, 3, 3), rep(NA, 8))
+  # 
+  # tseries <- ts(tseries, frequency = 4, start = c(1900, 01))
+  # 
+  # h <- 8
+  # p <- 4
+  
+  
+  # R implementation of Hamilton's replacement
+  # for time series filtering, to use for the same
+  # purposes of Hodrick-Prescott Filter.
+  #
+  # Reference: James Hamilton, "Why you should never use the Hodrick-Prescott Filter", 2017, NBER Working Paper
+  
+  # ts: the time series to filter out of the trend
+  # p : the number of lags to include 
+  # h : the forward term
+  
+  # the model to estimate is then:
+  # y_{t+h} = \alpha + \beta_1 y_{t} + \beta_2 y_{t-1} + ... + \beta_p y_{t-p}
+  #
+  # and this function will output the residuals of this regression
+  
+  
+  ##### Libraries #####
+  if (!require(xts)){install.packages('xts')}
+  
+  library(xts)
+  
+  if (log) tseries <- log(tseries)
+  
+  if (class(tseries) %in% c('zoo', 'ts', 'xts')){
+    #### Prepping data ####
+    
+    # keep the time index
+    time_ind <- time(tseries)
+    
+    # get rid of leading and trailing NA's
+    ts <- na.trim(tseries)
+    
+    time_ind_trim <- time(ts)
+    
+    # count remaining NA, barf in case
+    nas_count <- sum(is.na(ts))
+    
+    if (nas_count>=1) stop('NAs in the series!') 
+    if (length(ts)<= h+p) stop('Too few observations: you might want to decrease p and h.')
+    
+    
+    # lag data
+    lagged_ts <- embed(ts, dimension = h+p-1)
+    lagged_ts <- as.data.frame(lagged_ts)
+    names(lagged_ts) <- paste0('x', 1:(h+p-1))
+    
+    # dump useless cols
+    lagged_ts <- lagged_ts[,-(2:(h-1))]
+    
+    #### Running lm's ####
+    model <- lm(lagged_ts)
+    residuals <- resid(model)*100/model$model$x1
+    
+    
+    #### date up correctly residuals ####
+    residuals <- xts(residuals, order.by = as.Date(time_ind_trim)[-(1:(p+h-2))])
+    
+    return(residuals)
+  }else{warning('Provide a time series object!')}
+}
+
+
 ##### Packages Loader #####
 
 pkgs <- c('glue', 
