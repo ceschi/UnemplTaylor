@@ -125,3 +125,9 @@ $RECYCLE.BIN/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+*.aux
+*.nav
+*.out
+*.snm
+*.toc

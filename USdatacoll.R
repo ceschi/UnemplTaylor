@@ -399,9 +399,93 @@ spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 
 
 
+##### Wu-Xia Shadow FFR #####
+
+# This shadow rate ends in 2015 when the ZLB period was terminated.
+# using this shadow rate allows the inclusion of 
+# non-Taylor rule interventions of the CB in the 
+# quantity of money in the policy rate path
+
+download.file(url = 'http://faculty.chicagobooth.edu/jing.wu/research/data/policyrate.xls', 
+              destfile = file.path(temp_dir, 'wuxia_dwnl.xls'),
+              mode = 'wb',
+              quiet = T)
+
+shffr <- read_excel(path = file.path(temp_dir,'wuxia_dwnl.xls'),
+                    col_names = F,
+                    sheet = 'Sheet1')
+
+names(shffr) <- c('date', 'shffr')
+# the above lines download the xls file and dataframe it
+
+#### conversion to xts ####
+
+shffr <- shffr$shffr
+shffr <- as.xts(ts(shffr, frequency = 12, start=c(1960, 1)))
+shffr <- aggregate(shffr, as.yearqtr(as.yearmon(time(shffr))), mean)
+shffr <- merge(shffr, lag(shffr, 1))
+names(shffr) <- c('shffr', 'shffrb')
+
+
+##### Un. of Michigan Surveys of Consumers #######
+
+# Glossary:
+# perch is PERcentage CHange; 
+# SOC(M) is Survey Of Consumers (Michigan);
+# g is for Growth rate
+# ind is for INDex
+# diff is for DIFFerence, levels when not otherwise stated
+# download and read data from site
+socm_inflation <- read_csv('http://www.sca.isr.umich.edu/files/tbqpx1px5.csv',
+                           col_types = cols(QUARTER = col_character(),
+                                            YYYY = col_integer(),
+                                            PX_MD = col_double(),
+                                            PX5_MD = col_double()
+                                            ))
+
+# massage them into TS format, skipping 2 initial rows (dates are 1968)
+socm_inflation_ts <- as.xts(ts(socm_inflation$PX_MD[3:nrow(socm_inflation)], 
+                               start=c(1978,1), frequency=4))
+
+colnames(socm_inflation_ts) <- 'socm_e_cpi_1y_ahead'
+
+# importing the actual and expected consumers sentiments indexes
+socm_indexes <- read_csv('http://www.sca.isr.umich.edu/files/tbqiccice.csv', 
+                         col_types = cols(QUARTER = col_character(),
+                                          YYYY = col_integer(),
+                                          ICC = col_double(),
+                                          ICE = col_double()
+                                          ))
+
+# creating three series, adding the difference btw actual and expected
+indexes <- cbind(socm_indexes$ICC, socm_indexes$ICE, (socm_indexes$ICC - socm_indexes$ICE))
+
+socm_indexes_ts <- as.xts(ts(indexes, start=c(1960, 1), frequency=4,
+                             names=c('soc_actual_ind', 'soc_expected_ind','soc_diff_ind')))
+
+# creates the percentage variations from SOC levels, period over period
+
+g_indexes_rates <- diff(log(socm_indexes_ts[,1:2]))*100
+colnames(g_indexes_rates) <- c('soc_perch_actual_ind', 'soc_perch_expected_ind')
+
+SOC_Michigan <- merge(socm_inflation_ts,
+                      socm_indexes_ts,
+                      g_indexes_rates)
+
+
 #### Merge to dataset ####
 
-db_US <- merge(rates, rev_hist, unemployment, gap_output, spreads, money, fiscal, spf)
+db_US <- merge(rates, 
+               rev_hist,
+               unemployment,
+               gap_output,
+               spreads,
+               money,
+               fiscal,
+               spf,
+               shffr,
+               SOC_Michigan)
+
 write.zoo(x=db_US, 
           file=file.path(data_dir, 'US_data.txt'), 
           sep=';', 
@@ -443,5 +527,8 @@ inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
 spf_corepce, spf_cpi, spf_pce, rev_hist,
-tbill3_ffr)
+tbill3_ffr, shffr,
+socm_inflation, socm_indexes, indexes, socm_indexes_ts,
+socm_inflation_ts, g_indexes_rates, SOC_Michigan,
+short_long_diff)
 if (flag___singular == 1) rm(ahead)

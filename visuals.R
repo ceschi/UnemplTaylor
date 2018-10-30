@@ -188,7 +188,11 @@ ggsave(plot = plot_spread,
        height = pdf_height, width = pdf_width, units='in')
 
 
+##### LIST OF ADDITIONAL PLOTS #####
 
+# Phillips curve
+# money aggregates growth rates
+# kernel density plots for inflations
 
 
 ##### Plots collector #####
@@ -213,7 +217,8 @@ rm(plot_trvars,
    plot_spf_iqr,
    plot_spread,
    pdf_height,
-   pdf_width
+   pdf_width,
+   invsc
    )
 
 
