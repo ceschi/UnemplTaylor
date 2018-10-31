@@ -49,10 +49,10 @@ core_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
 deflator_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
                                  sheet='gPGDP', col_types=classi, na='#N/D')
 
-# replace NAs
-cpi_greenbook[cpi_greenbook=='NaN'] <- NA
-core_greenbook[core_greenbook=='NaN'] <- NA
-deflator_greenbook[deflator_greenbook=='NaN'] <- NA
+# # replace NAs
+# cpi_greenbook[cpi_greenbook=='NaN'] <- NA
+# core_greenbook[core_greenbook=='NaN'] <- NA
+# deflator_greenbook[deflator_greenbook=='NaN'] <- NA
 
 # drop useless columns
 cpi_greenbook <- cpi_greenbook[,-c(2:5, 16, 15)]
