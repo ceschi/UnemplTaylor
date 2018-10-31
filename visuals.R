@@ -188,9 +188,9 @@ ggsave(plot = plot_spread,
        height = pdf_height, width = pdf_width, units='in')
 
 # Phillips Curve, classic one
-plot_phil <- ggplot(db_US, aes(y = rev_cpi, x = layoffs, colour = index(db_US)))+
-      geom_path() + geom_point(size = .5)+
-      theme_bw()+xlab('Layoff rate') + ylab('Revised CPI')+labs(colour = ' ')+
+plot_phil <- ggplot(db_US, aes(y = rev_cpi, x = unempl_rate, colour = as.Date(index(db_US))))+
+      geom_path(size=1) + geom_point(size = 2.5)+
+      theme_bw()+xlab('Unemployment rate') + ylab('Revised CPI')+labs(colour = 'Years')+
       ggtitle('Phillips Curve')
 
 if (flag___plot == 0) print(plot_phil)
@@ -200,6 +200,45 @@ ggsave(plot = plot_phil,
        path=graphs_dir,
        device='pdf',
        height = pdf_height, width = pdf_width, units='in')
+
+# Phillips Curve, layoffs
+plot_phil_lay <- ggplot(db_US, aes(y = rev_cpi, x = layoffs, colour = as.Date(index(db_US))))+
+  geom_path(size=1) + geom_point(size = 2.5)+
+  theme_bw()+xlab('Layoff rate') + ylab('Revised CPI')+labs(colour = 'Years')+
+  ggtitle('Phillips Curve - Layoff rate')
+
+if (flag___plot == 0) print(plot_phil_lay)
+
+ggsave(plot = plot_phil_lay,
+       filename='phil_curve_lay.pdf',
+       path=graphs_dir,
+       device='pdf',
+       height = pdf_height, width = pdf_width, units='in')
+
+# Phillips Curve, employment fluctuations
+plot_phil_fluct <- ggplot(db_US, aes(y = rev_cpi, x = employment_fluct, colour = as.Date(index(db_US))))+
+  geom_path(size=1) + geom_point(size = 2.5)+
+  theme_bw()+xlab('Employment fluctuations') + ylab('Revised CPI')+labs(colour = 'Years')+
+  ggtitle('Phillips Curve - Employment Fluctuations around long term rate')
+
+if (flag___plot == 0) print(plot_phil_fluct)
+
+ggsave(plot = plot_phil_fluct,
+       filename='phil_curve_fluct.pdf',
+       path=graphs_dir,
+       device='pdf',
+       height = pdf_height, width = pdf_width, units='in')
+
+
+# plot_hist <- ggplot(data=db_US)+
+#   geom_density(aes(x=deflt, fill=' '), alpha= .5)+
+#   geom_density(aes(x=deflt1, fill=''), alpha= .5)+
+#   geom_density(aes(x=ffr, fill = 'ffr'), alpha = .5)+
+#   labs(' ')+theme_bw()+
+#   scale_fill_manual( values = c("red","blue", "green"), labels = c('now', '1 ahead', 'FFR'), name=' ')+ 
+#   xlab('Inflation rates')+
+#   ggtitle('Distribution of the inflation rates')
+# print(plot_hist)
 
 
 ##### LIST OF ADDITIONAL PLOTS #####
@@ -219,7 +258,9 @@ plots <- list(plot_trvars,
               plot_spf_iqr,
               plot_money,
               plot_spread,
-              plot_phil)
+              plot_phil,
+              plot_phil_lay,
+              plot_phil_fluct)
 
 ##### Housekeeping #####
 rm(plot_trvars,
@@ -235,6 +276,8 @@ rm(plot_trvars,
    pdf_width,
    invsc,
    plot_phil
+   plot_phil_lay,
+   plot_phil_fluct
    )
 
 
