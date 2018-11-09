@@ -37,7 +37,7 @@ ggsave(plot_trvars,
 plot_re_infl <- ggplot(db_US["1945/"], aes(x=index(db_US["1945/"])))+
   geom_line(aes(y=rev_cpi, colour='Rev. Infl.'),size= 1)+
   geom_line(aes(y=rev_cpi_fe, colour='Rev. Infl. no FE'),size= 1)+
-  geom_line(aes(y=rev_pce, colour='Rev. PCE'))+
+  geom_line(aes(y=rev_pce, colour='Rev. PCE'),size= 1)+
   geom_line(aes(y=rev_pce_fe, colour='Rev. PCE no FE'),size= 1)+
   geom_line(aes(y=rev_defl, colour='Rev. Defl.'),size= 1)+
   theme_bw()+xlab(' ')+ylab(' ')+labs(colour=' ')+
@@ -230,22 +230,47 @@ ggsave(plot = plot_phil_fluct,
        height = pdf_height, width = pdf_width, units='in')
 
 
-# plot_hist <- ggplot(data=db_US)+
-#   geom_density(aes(x=deflt, fill=' '), alpha= .5)+
-#   geom_density(aes(x=deflt1, fill=''), alpha= .5)+
-#   geom_density(aes(x=ffr, fill = 'ffr'), alpha = .5)+
-#   labs(' ')+theme_bw()+
-#   scale_fill_manual( values = c("red","blue", "green"), labels = c('now', '1 ahead', 'FFR'), name=' ')+ 
-#   xlab('Inflation rates')+
-#   ggtitle('Distribution of the inflation rates')
-# print(plot_hist)
+plot_hist_pi <- ggplot(data=db_US)+
+  geom_density(aes(x=deflt, fill=' '), alpha= .5)+
+  geom_density(aes(x=deflt1, fill=''), alpha= .5)+
+  geom_density(aes(x=ffr, fill = 'ffr'), alpha = .5)+
+  labs(' ')+theme_bw()+
+  scale_fill_manual( values = c("red","blue", "green"), labels = c('now', '1 ahead', 'FFR'), name=' ')+
+  xlab('Inflation rates')+
+  ggtitle('Distribution of the inflation rates')
+
+if (flag___plot == 0) print(plot_hist_pi)
+
+ggsave(plot = plot_hist_pi,
+       filename='pi_kernels.pdf',
+       path=graphs_dir,
+       device='pdf',
+       height = pdf_height, width = pdf_width, units='in')
 
 
 ##### LIST OF ADDITIONAL PLOTS #####
 
-# Phillips curve
+
 # money aggregates growth rates
 # kernel density plots for inflations
+
+
+
+##### Residuals and results from regressions in USreg.r #####
+## of course, source the script beforehand
+
+if (flag___singular==1) source('USreg.r')
+
+# outputs all results in regressions list
+
+for (m in 1:length(regressions$models)){
+  # costum function, prints and plots
+  # results gathered in regression list
+  # and writes results in a txt file
+  reg_call(m)
+}
+
+
 
 
 ##### Plots collector #####
@@ -260,7 +285,8 @@ plots <- list(plot_trvars,
               plot_spread,
               plot_phil,
               plot_phil_lay,
-              plot_phil_fluct)
+              plot_phil_fluct,
+              plot_hist_pi)
 
 ##### Housekeeping #####
 rm(plot_trvars,
@@ -274,10 +300,11 @@ rm(plot_trvars,
    plot_spread,
    pdf_height,
    pdf_width,
+   plot_phil,
    invsc,
-   plot_phil
    plot_phil_lay,
-   plot_phil_fluct
+   plot_phil_fluct,
+   plot_hist_pi
    )
 
 
