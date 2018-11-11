@@ -473,6 +473,89 @@ SOC_Michigan <- merge(socm_inflation_ts,
                       g_indexes_rates)
 
 
+##### EPU indexes #####
+# nb: the US EPU contains data from SPF
+# that we already have: using EPU + SPF
+# together is not advised, use rather 
+# categorical series with the exclusion of
+# economic forecasters disagreement
+
+# download excel files
+download.file(url = 'http://www.policyuncertainty.com/media/US_Policy_Uncertainty_Data.xlsx',
+              destfile = file.path(temp_dir, 'EPU_aggregate.xlsx'), 
+              mode = 'wb',
+              quiet = T)
+
+download.file(url = 'http://www.policyuncertainty.com/media/Categorical_EPU_Data.xlsx',
+              destfile = file.path(temp_dir, 'EPU_categories.xlsx'), 
+              mode = 'wb',
+              quiet = T)
+
+# import data, drop last row
+epu_aggregate <- read_excel(path = file.path(temp_dir, 'EPU_aggregate.xlsx'),
+                            col_names = T, 
+                            sheet = 1,
+                            col_types = 'numeric'
+                            )
+epu_aggregate <- epu_aggregate[-nrow(epu_aggregate),]
+
+epu_aggregate_comp <- read_excel(path = file.path(temp_dir, 'EPU_aggregate.xlsx'),
+                                 col_names = T, 
+                                 sheet = 2, 
+                                 col_types = 'numeric'
+                                 )
+epu_aggregate_comp <- epu_aggregate_comp[-nrow(epu_aggregate_comp),]
+
+epu_cat <- read_excel(path = file.path(temp_dir, 'EPU_categories.xlsx'),
+                      col_names = T,
+                      sheet = 1,
+                      col_types = c('date', rep('numeric', 12))
+                      )
+epu_cat <- epu_cat[-nrow(epu_cat),]
+
+# convert data to xts
+epu_aggregate_ts <- ts(data = epu_aggregate, 
+                       start=c(epu_aggregate$Year[1], 
+                               epu_aggregate$Month[1]),
+                       frequency = 12) %>% 
+                    aggregate(FUN = mean, nfrequency = 4) %>%
+                    xts(x = ., order.by = as.Date(time(.)))
+
+
+
+epu_aggregate_comp_ts <- ts(data = epu_aggregate_comp, 
+                            start=c(epu_aggregate_comp$Year[1], 
+                                    epu_aggregate_comp$Month[1]),
+                            frequency = 12) %>% 
+                          aggregate(FUN = mean, nfrequency = 4) %>%
+                          xts(x = ., order.by = as.Date(time(.)))
+
+epu_cat_ts <- ts(data = epu_cat,
+                 start = c(1985, 01),
+                 frequency = 12) %>% 
+              aggregate(FUN = mean, nfrequency = 4) %>% 
+              xts(x = ., order.by = as.Date(time(.)))
+# epu_cat_ts <- xts(x = epu_cat, frequency = 12, order.by = epu_cat$Date)
+
+epu_aggregate_ts$Month <- epu_aggregate_ts$Year <- NULL
+epu_aggregate_comp_ts$Month <- epu_aggregate_comp_ts$Year <- epu_aggregate_comp_ts$News_Based_Policy_Uncert_Index <- NULL
+epu_cat_ts$Date <- NULL
+
+names(epu_aggregate_ts) <- c('epu_baseline_index', 'epu_news_index')
+names(epu_aggregate_comp_ts) <- c('epu_public_purchases', 'epu_cpi_spf_disagr', 'epu_tax_expir')
+names(epu_cat_ts) <- c('epu_econpol', 'epu_monpol', 'epu_fiscal', 'epu_taxes', 
+                       'epu_gvt_spending', 'epu_healthcare', 'epu_natsec',
+                       'epu_entitle', 'epu_regul', 'epu_finregul', 'epu_tradepol',
+                       'epu_debt_curr')
+
+epu <- merge(epu_aggregate_ts,
+             epu_aggregate_comp_ts,
+             epu_cat_ts)
+
+
+
+
+
 #### Merge to dataset ####
 
 db_US <- merge(rates, 
@@ -484,7 +567,8 @@ db_US <- merge(rates,
                fiscal,
                spf,
                shffr,
-               SOC_Michigan)
+               SOC_Michigan,
+               epu)
 
 write.zoo(x=db_US, 
           file=file.path(data_dir, 'US_data.txt'), 
@@ -530,5 +614,7 @@ spf_corepce, spf_cpi, spf_pce, rev_hist,
 tbill3_ffr, shffr,
 socm_inflation, socm_indexes, indexes, socm_indexes_ts,
 socm_inflation_ts, g_indexes_rates, SOC_Michigan,
-short_long_diff)
+short_long_diff, epu_aggregate, epu_aggregate_comp,
+epu_aggregate_comp_ts, epu_aggregate_ts,
+epu_cat, epu_cat_ts, epu)
 if (flag___singular == 1) rm(ahead)
