@@ -252,23 +252,6 @@ ggsave(plot = plot_hist_pi,
 
 
 # money aggregates growth rates
-# kernel density plots for inflations
-
-
-
-##### Residuals and results from regressions in USreg.r #####
-## of course, source the script beforehand
-
-if (flag___singular==1) source('USreg.r')
-
-# outputs all results in regressions list
-
-for (m in 1:length(regressions$models)){
-  # costum function, prints and plots
-  # results gathered in regression list
-  # and writes results in a txt file
-  reg_call(m)
-}
 
 
 
