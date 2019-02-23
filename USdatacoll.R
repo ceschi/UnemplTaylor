@@ -206,7 +206,125 @@ options(warn=0) # reactivates warnings
 
 ##### Consumption #####
 # work in progress
-# real_cons_exp <-  fredr_series_observations(series_id = 'PCECC96', frequency = 'q') %>% 
+real_cons_exp <-  fredr_series_observations(series_id = 'PCECC96', frequency = 'q') %>% tbl_xts()
+real_cons_exp_g <- diff(log(real_cons_exp))*100
+real_cons_exp_filtered <- hamil_filter(real_cons_exp)
+
+cons_durables <- fredr_series_observations(series_id = 'PCEDG', frequency = 'q') %>% tbl_xts()
+cons_durables_g <- diff(log(cons_durables))*100
+cons_durables_filtered <- hamil_filter(cons_durables)
+
+cons_nondurables <- fredr_series_observations(series_id = 'PCEND', frequency = 'q') %>% tbl_xts()
+cons_nondurables_g <- diff(log(cons_nondurables))*100
+cons_nondurables_filtered <- hamil_filter(cons_nondurables)
+
+cons_serv <- fredr_series_observations(series_id = 'PCESV', frequency = 'q') %>% tbl_xts()
+cons_serv_g <- diff(log(cons_serv))*100
+cons_serv_filtered <- hamil_filter(cons_serv)
+
+cons_FE <- fredr_series_observations(series_id = 'DPCCRC1M027SBEA', frequency = 'q') %>% tbl_xts()
+cons_FE_g <- diff(log(cons_FE))*100
+cons_FE_filtered <- hamil_filter(cons_FE)
+
+cons_gvt <- fredr_series_observations(series_id = 'GCEC1', frequency = 'q') %>% tbl_xts()
+cons_gvt_g <- diff(log(cons_gvt))*100
+cons_gvt_filtered <- hamil_filter(cons_gvt)
+
+cons_defense <- fredr_series_observations(series_id = 'FDEFX', frequency = 'q') %>% tbl_xts()
+cons_defense_g <- diff(log(cons_defense))*100
+cons_defense_filtered <- hamil_filter(cons_defense)
+
+
+consumption <- merge(real_cons_exp,
+                     real_cons_exp_g,
+                     real_cons_exp_filtered,
+                     cons_durables,
+                     cons_durables_g,
+                     cons_durables_filtered,
+                     cons_nondurables,
+                     cons_nondurables_g,
+                     cons_nondurables_filtered,
+                     cons_serv,
+                     cons_serv_g,
+                     cons_serv_filtered,
+                     cons_FE,
+                     cons_FE_g,
+                     cons_FE_filtered,
+                     cons_gvt,
+                     cons_gvt_g,
+                     cons_gvt_filtered,
+                     cons_defense,
+                     cons_defense_g,
+                     cons_defense_filtered)
+
+names(consumption) <- c('real_c',
+                        'real_c_g',
+                        'real_c_filtered',
+                        'c_durab',
+                        'c_durab_g',
+                        'c_durab_filtered',
+                        'c_nondurab',
+                        'c_nondurab_g',
+                        'c_nondurab_filtered',
+                        'c_serv',
+                        'c_serv_g',
+                        'c_serv_filtered',
+                        'c_noFE',
+                        'c_noFE_g',
+                        'c_noFE_filtered',
+                        'c_gvt',
+                        'c_gvt_g',
+                        'c_gvt_filtered',
+                        'c_defense',
+                        'c_defense_g',
+                        'c_defense_filtered'
+                        )
+# mnemonics <- c("GPDI",
+#                "GPDIC1",
+#                "PNFI",
+#                "PRFI",
+#                "DRSFRMACBS",
+#                "EMRATIO",
+#                "PAYEMS",
+#                "CES0500000003",
+#                "CE16OV",
+#                "LREM25TTUSQ156S",
+#                "CES9091000001",
+#                "LNS12300060",
+#                "U6RATE",
+#                "UEMPMEAN",
+#                "AWHNONAG",
+#                "AWHMAN",
+#                "CES0600000007",
+#                "CES4300000007",
+#                "CEU4200000007",
+#                "CES4200000007",
+#                "CEU3100000007"
+#                )
+# 
+# descr <- c('priv_inv',
+#            'real_priv_inv',
+#            'nonresidential_fixed_inv',
+#            'residential_fixed_inv',
+#            'deliquency_rate',
+#            'active_ratio',
+#            'payroll',
+#            'priv_hourly_wage',
+#            'civil_empl',
+#            'emp_rate_prime',
+#            'tot_unempl',
+#            'mean_unempl_duration',
+#            'week_hours_tot',
+#            'week_hours_manufacturing',
+#            'week_hours_goods',
+#            'week_hours_logistics',
+#            'week_hours_trade',
+#            'week_hours_trade_seasonadj',
+#            'week_hours_durable'
+#            )
+# 
+# fredrlist <- data.frame(mnem = mnemonics,
+#                         descr = descr)
 
 ###### List of additional series ########
 # mnemonics	desc
@@ -217,6 +335,7 @@ options(warn=0) # reactivates warnings
 # DPCCRC1M027SBEA	personal consumption expenditures ex food and energy
 # GCEC1	Real Government Consumption Expenditures and Gross Investment
 # FDEFX	Federal Government: National Defense Consumption Expenditures and Gross Investment
+# 
 # GPDI	Gross Private Domestic Investment
 # GPDIC1	Real Gross Private Domestic Investment
 # PNFI	Private Nonresidential Fixed Investment
@@ -238,6 +357,11 @@ options(warn=0) # reactivates warnings
 # CEU4200000007	Average Weekly Hours of Production and Nonsupervisory Employees: Retail Trade
 # CES4200000007	Average Weekly Hours of Production and Nonsupervisory Employees: Retail Trade  seasonally adj
 # CEU3100000007	Average Weekly Hours of Production and Nonsupervisory Employees: Durable Goods
+
+# OIL prices
+# WTISPLC	Spot Crude Oil Price: West Texas Intermediate
+# DCOILBRENTEU	Crude Oil Prices: Brent - Europe
+
 
 
 
@@ -563,6 +687,7 @@ db_US <- merge(rates,
                unemployment,
                gap_output,
                spreads,
+               consumption,
                money,
                fiscal,
                spf,
@@ -616,5 +741,13 @@ socm_inflation, socm_indexes, indexes, socm_indexes_ts,
 socm_inflation_ts, g_indexes_rates, SOC_Michigan,
 short_long_diff, epu_aggregate, epu_aggregate_comp,
 epu_aggregate_comp_ts, epu_aggregate_ts,
-epu_cat, epu_cat_ts, epu)
+epu_cat, epu_cat_ts, epu, real_cons_exp,
+real_cons_exp_g, real_cons_exp_filtered,
+cons_durables,cons_durables_g,cons_durables_filtered,
+cons_nondurables,cons_nondurables_g,
+cons_nondurables_filtered,cons_serv,
+cons_serv_g,cons_serv_filtered,
+cons_FE,cons_FE_g,cons_FE_filtered,
+cons_gvt,cons_gvt_g,cons_gvt_filtered,
+cons_defense,cons_defense_g,cons_defense_filtered)
 if (flag___singular == 1) rm(ahead)

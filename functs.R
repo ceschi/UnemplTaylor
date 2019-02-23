@@ -332,6 +332,22 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
 }
 
 
+fredr_down <- function(mnem, name, freq = 'q'){
+  series <- fredr_series_observations(series_id = mnem,
+                                      frequency = freq) %>% 
+    tbl_xts()
+  
+  gather_series <- merge(series,
+                         diff(log(series))*100,
+                         hamil_filter(series))
+  
+  names(gather_series) <- paste(rep(name, 3), c('', '_g', '_filtered'), sep = '')
+  
+  return(gather_series)
+  
+}
+
+
 ##### Packages Loader #####
 
 pkgs <- c('glue', 
