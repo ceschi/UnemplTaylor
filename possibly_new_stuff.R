@@ -3,7 +3,7 @@
 
 ##### FULL SAMPLE ##### 
 
-splits <- c('/1979:6', '1980:1/2007:6', '2007:6/')
+splits <- c('/1979:1', '1982:1/2007:6', '2007:6/')
 
 full_sample <- lapply(regressions$formula, lm, data=db_US[splits[2]])
 
