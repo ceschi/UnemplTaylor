@@ -125,7 +125,7 @@ rev_hist <- merge(
                                          units='pc1') %>% tbl_xts(),
           
           # Personal Consumption Expenditures including Food and Energy
-          rev_pce  = fredr_series_observations(series_id='PCE', 
+          rev_pce  = fredr_series_observations(series_id='PCEPI', 
                                              frequency='q', 
                                          aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
@@ -203,6 +203,8 @@ gap_output <- merge(y_real_gap, gap_expost)
 names(gap_output) <- c('realtime_gap', 'expost_gap')
                       # philly and st louis gaps, respectively
 options(warn=0) # reactivates warnings
+
+cfnai <- fredr_series_observations(series_id = 'CFNAI', frequency = 'q') %>% tbl_xts()
 
 ##### Consumption #####
 # work in progress
@@ -685,6 +687,7 @@ db_US <- merge(rates,
                rev_hist,
                unemployment,
                gap_output,
+               cfnai,
                spreads,
                consumption,
                money,
@@ -735,7 +738,7 @@ inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
 spf_corepce, spf_cpi, spf_pce, rev_hist,
-tbill3_ffr, shffr,
+tbill3_ffr, shffr, cfnai,
 socm_inflation, socm_indexes, indexes, socm_indexes_ts,
 socm_inflation_ts, g_indexes_rates, SOC_Michigan,
 short_long_diff, epu_aggregate, epu_aggregate_comp,
