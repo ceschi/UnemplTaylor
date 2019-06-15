@@ -33,7 +33,7 @@ ffrate <- merge(ffr, ffrb)
 # downloads the big xlsx Greenbook file in
 # a specifically created folder
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/greenbook-data/documentation/gbweb_row_format.xls?la=en',
-              file.path(temp_dir,'Greenbook_allvar_row.xls'), mode='wb',
+              file.path(temp_dir,'Greenbook_allvar_row.xlsx'), mode='wb',
               extra='--no-check-certificate',
               quiet = T)
 
@@ -42,11 +42,11 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-ti
 
 classi <- c('text', rep('numeric', 14), 'text')
 
-cpi_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'), 
+cpi_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'), 
                             sheet='gPCPI', col_types=classi, na='#N/D')
-core_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
+core_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'),
                              sheet='gPCPIX', col_types=classi, na='#N/D')
-deflator_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xls'),
+deflator_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'),
                                  sheet='gPGDP', col_types=classi, na='#N/D')
 
 # # replace NAs
@@ -109,31 +109,31 @@ rev_hist <- merge(
           # Consumer Price Index for All Urban Consumers: All Items 
           rev_pci = fredr_series_observations(series_id='CPIAUCSL', 
                                           frequency='q', 
-                                        aggregation_method='eop', 
+                                        # aggregation_method='eop', 
                                         units='pc1') %>% tbl_xts(), 
           
           # Consumer Price Index for All Urban Consumers: All Items Less Food and Energy
           rev_pci_fe  = fredr_series_observations(series_id='CPILFESL', 
                                             frequency='q', 
-                                            aggregation_method='eop', 
+                                            # aggregation_method='eop', 
                                             units='pc1') %>% tbl_xts(),
           
           # Gross Domestic Product: Implicit Price Deflator
           rev_defl = fredr_series_observations(series_id='GDPDEF', 
                                           frequency='q', 
-                                         aggregation_method='eop', 
+                                         # aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
           
           # Personal Consumption Expenditures including Food and Energy
           rev_pce  = fredr_series_observations(series_id='PCEPI', 
                                              frequency='q', 
-                                         aggregation_method='eop', 
+                                         # aggregation_method='eop', 
                                          units='pc1') %>% tbl_xts(),
           
           # Personal Consumption Expenditures Excluding Food and Energy
           rev_pce_fe  = fredr_series_observations(series_id='PCEPILFE', 
                                             frequency='q', 
-                                            aggregation_method='eop', 
+                                            # aggregation_method='eop', 
                                             units='pc1') %>% tbl_xts()
 ) 
 # renames variables
@@ -373,6 +373,12 @@ names(consumption) <- c('real_c',
 ## BAA 10Y bonds        !!! - DISCONTINUED BY FRED - !!!
 spread_baa <- fredr_series_observations(series_id='BAA10Y', frequency='q') %>% tbl_xts()
 
+## BAA 20+ year bonds rate
+baa <- fredr_series_observations(series_id = 'BAA', frequency = 'q') %>% tbl_xts()
+
+## AAA 20+ year bonds rate
+aaa <- fredr_series_observations(series_id = 'AAA', frequency = 'q') %>% tbl_xts()
+
 ## 3 months Tbill rate
 tbill_rate_3m <- fredr_series_observations(series_id='TB3MS',frequency='q') %>% tbl_xts()
 
@@ -413,12 +419,25 @@ sp_ret <- as.xts(aggregate(sp_ret, as.yearqtr(as.yearmon(time(sp_ret))), mean))
 # spread_sp <- (sp_ret - one_year)
 spread_sp_3m <- sp_ret - tbill_rate_3m
 
+# replicate spread from moody's
+spread_baa_long <- baa - tbill_rate_10y
+
+# quality spread
+spread_baa_aaa <- baa - aaa
+
+# corp vs treas spread
+spread_aaa <- aaa - tbill_rate_10y
+
 spreads <- merge(spread_baa, spread_sp_3m, 
                  tbill3_ffr, tbill_rate_3m,
-                 tbill_rate_1y, tbill_rate_10y)
+                 tbill_rate_1y, tbill_rate_10y,
+                 spread_baa_long, spread_baa_aaa,
+                 spread_aaa, aaa, baa)
 names(spreads) <- c('spread_baa', 'spread_sp_3m',
                     'tbill3_ffr', 'tbill_rate_3m',
-                    'tbill_rate_1y', 'tbill_rate_10y')
+                    'tbill_rate_1y', 'tbill_rate_10y',
+                    'spread_baa_long', 'spread_baa_aaa',
+                    'spread_aaa', 'aaa', 'baa')
 
 options("getSymbols.warning4.0"=T) # activates disclaimer v0.4
 
@@ -473,18 +492,19 @@ names(fiscal) <- c('surplus_gdp', 'debt_growth', 'debt_gdp', 'debt_fed', 'debt_f
 base <- fredr_series_observations(series_id='BOGMBASE', frequency='q') %>% tbl_xts() %>% `/`(.,1000)
 m1 <- fredr_series_observations(series_id='M1SL', frequency='q') %>% tbl_xts()
 m2 <- fredr_series_observations(series_id='M2SL', frequency='q') %>% tbl_xts()
+m3 <- fredr_series_observations(series_id = 'MABMM301USM189S', frequency = 'q') %>% tbl_xts()
 
-money <- merge(base, m1, m2)
-names(money) <- c('base', 'm1', 'm2')
+money <- merge(base, m1, m2, m3)
+names(money) <- c('base', 'm1', 'm2', 'm3')
 
 # monetary aggregates growth rates
 money_g <- diff(log(money))*100
-names(money_g) <- c('base_g', 'm1_g', 'm2_g')
+names(money_g) <- c('base_g', 'm1_g', 'm2_g', 'm3_g')
 
 
 #### SPF DATA ####
 
-# automatize download of the xlsx file, import, run statistics and merge
+# automate download of the xlsx file, import, run statistics and merge
 
 # download CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
@@ -636,7 +656,7 @@ epu_cat <- read_excel(path = file.path(temp_dir, 'EPU_categories.xlsx'),
                       sheet = 1,
                       col_types = c('date', rep('numeric', 12))
                       )
-epu_cat <- epu_cat[-nrow(epu_cat),]
+epu_cat <- epu_cat[-c((nrow(epu_cat)-1),nrow(epu_cat)),]
 
 # convert data to xts
 epu_aggregate_ts <- ts(data = epu_aggregate, 
@@ -732,8 +752,9 @@ current_unemp, tot_emp, layoffs, employment_fluct,
 cols, gdp_waves, rates, ffrate, unemployment, gap_output,
 spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
+spread_baa_long, spread_baa_aaa, spread_aaa, aaa, baa,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
-base, m1, m2, money, money_g, gdp,
+base, m1, m2, m3, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,

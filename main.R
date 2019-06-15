@@ -1,6 +1,7 @@
-#### Main file for Taylor rule second branch of rsch ####
-#### using unemployment metrics to proxy output gap #####
-
+#### Main code caller for building and 
+#### maintaining a db on main real-time,
+#### revised and expectational macro indicators
+#### of the US economy.
 
 #### Flagging
 # make this interactive at the beginning of the 
