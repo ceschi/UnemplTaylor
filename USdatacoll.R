@@ -501,6 +501,8 @@ names(money) <- c('base', 'm1', 'm2', 'm3')
 money_g <- diff(log(money))*100
 names(money_g) <- c('base_g', 'm1_g', 'm2_g', 'm3_g')
 
+money <-  merge(money, money_g)
+
 
 #### SPF DATA ####
 
