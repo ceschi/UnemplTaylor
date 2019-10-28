@@ -583,41 +583,41 @@ names(shffr) <- c('shffr', 'shffrb')
 # ind is for INDex
 # diff is for DIFFerence, levels when not otherwise stated
 # download and read data from site
-socm_inflation <- read_csv('http://www.sca.isr.umich.edu/files/tbqpx1px5.csv',
-                           col_types = cols(QUARTER = col_character(),
-                                            YYYY = col_integer(),
-                                            PX_MD = col_double(),
-                                            PX5_MD = col_double()
-                                            ))
+# socm_inflation <- read_csv('http://www.sca.isr.umich.edu/files/tbqpx1px5.csv',
+#                            col_types = cols(QUARTER = col_character(),
+#                                             YYYY = col_integer(),
+#                                             PX_MD = col_double(),
+#                                             PX5_MD = col_double()
+#                                             ))
 
-# massage them into TS format, skipping 2 initial rows (dates are 1968)
-socm_inflation_ts <- as.xts(ts(socm_inflation$PX_MD[3:nrow(socm_inflation)], 
-                               start=c(1978,1), frequency=4))
+# # massage them into TS format, skipping 2 initial rows (dates are 1968)
+# socm_inflation_ts <- as.xts(ts(socm_inflation$PX_MD[3:nrow(socm_inflation)], 
+#                                start=c(1978,1), frequency=4))
 
-colnames(socm_inflation_ts) <- 'socm_e_cpi_1y_ahead'
+# colnames(socm_inflation_ts) <- 'socm_e_cpi_1y_ahead'
 
-# importing the actual and expected consumers sentiments indexes
-socm_indexes <- read_csv('http://www.sca.isr.umich.edu/files/tbqiccice.csv', 
-                         col_types = cols(QUARTER = col_character(),
-                                          YYYY = col_integer(),
-                                          ICC = col_double(),
-                                          ICE = col_double()
-                                          ))
+# # importing the actual and expected consumers sentiments indexes
+# socm_indexes <- read_csv('http://www.sca.isr.umich.edu/files/tbqiccice.csv', 
+#                          col_types = cols(QUARTER = col_character(),
+#                                           YYYY = col_integer(),
+#                                           ICC = col_double(),
+#                                           ICE = col_double()
+#                                           ))
 
-# creating three series, adding the difference btw actual and expected
-indexes <- cbind(socm_indexes$ICC, socm_indexes$ICE, (socm_indexes$ICC - socm_indexes$ICE))
+# # creating three series, adding the difference btw actual and expected
+# indexes <- cbind(socm_indexes$ICC, socm_indexes$ICE, (socm_indexes$ICC - socm_indexes$ICE))
 
-socm_indexes_ts <- as.xts(ts(indexes, start=c(1960, 1), frequency=4,
-                             names=c('soc_actual_ind', 'soc_expected_ind','soc_diff_ind')))
+# socm_indexes_ts <- as.xts(ts(indexes, start=c(1960, 1), frequency=4,
+#                              names=c('soc_actual_ind', 'soc_expected_ind','soc_diff_ind')))
 
-# creates the percentage variations from SOC levels, period over period
+# # creates the percentage variations from SOC levels, period over period
 
-g_indexes_rates <- diff(log(socm_indexes_ts[,1:2]))*100
-colnames(g_indexes_rates) <- c('soc_perch_actual_ind', 'soc_perch_expected_ind')
+# g_indexes_rates <- diff(log(socm_indexes_ts[,1:2]))*100
+# colnames(g_indexes_rates) <- c('soc_perch_actual_ind', 'soc_perch_expected_ind')
 
-SOC_Michigan <- merge(socm_inflation_ts,
-                      socm_indexes_ts,
-                      g_indexes_rates)
+# SOC_Michigan <- merge(socm_inflation_ts,
+#                       socm_indexes_ts,
+#                       g_indexes_rates)
 
 
 ##### EPU indexes #####
@@ -762,8 +762,8 @@ debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
 spf_corepce, spf_cpi, spf_pce, rev_hist,
 tbill3_ffr, shffr, cfnai,
-socm_inflation, socm_indexes, indexes, socm_indexes_ts,
-socm_inflation_ts, g_indexes_rates, SOC_Michigan,
+# socm_inflation, socm_indexes, indexes, socm_indexes_ts,
+# socm_inflation_ts, g_indexes_rates, SOC_Michigan,
 short_long_diff, epu_aggregate, epu_aggregate_comp,
 epu_aggregate_comp_ts, epu_aggregate_ts,
 epu_cat, epu_cat_ts, epu, real_cons_exp,
@@ -774,5 +774,8 @@ cons_nondurables_filtered,cons_serv,
 cons_serv_g,cons_serv_filtered,
 cons_FE,cons_FE_g,cons_FE_filtered,
 cons_gvt,cons_gvt_g,cons_gvt_filtered,
-cons_defense,cons_defense_g,cons_defense_filtered)
+cons_defense,cons_defense_g,cons_defense_filtered,
+
+
+consumption)
 if (flag___singular == 1) rm(ahead)
