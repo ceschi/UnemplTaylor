@@ -582,42 +582,78 @@ names(shffr) <- c('shffr', 'shffrb')
 # g is for Growth rate
 # ind is for INDex
 # diff is for DIFFerence, levels when not otherwise stated
-# download and read data from site
-# socm_inflation <- read_csv('http://www.sca.isr.umich.edu/files/tbqpx1px5.csv',
-#                            col_types = cols(QUARTER = col_character(),
-#                                             YYYY = col_integer(),
-#                                             PX_MD = col_double(),
-#                                             PX5_MD = col_double()
-#                                             ))
+# create list with requests to send
+# to the UoM website
+req_fields <- list(#'User-Agent' = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Mobile Safari/537.36',
+                   table = '32',
+                   year = '1960',
+                   qorm = "Q",
+                   order = 'asc',
+                   format = "View Below")
 
-# # massage them into TS format, skipping 2 initial rows (dates are 1968)
-# socm_inflation_ts <- as.xts(ts(socm_inflation$PX_MD[3:nrow(socm_inflation)], 
-#                                start=c(1978,1), frequency=4))
+# consumers' expected inflation, 1 year ahead
+socm_1y_inflation <- POST(url = 'https://data.sca.isr.umich.edu/data-archive/mine.php',
+                  body = req_fields,
+                  encode = 'form', verbose()
+                  ) %>% 
+            content('parsed') %>%
+            rvest::html_table() %>% 
+            .[[2]] %>% 
+            select(X13, X15) %>% 
+            .[-1,] %>% 
+            ts(start = c(1960, 1), frequency = 4) %>%
+            xts(order.by = time(.) %>% as.Date()) %>% 
+            rename(X13 = socm_1y_inflation_mean,
+                 X14 = socm_1y_inflation_sd)
 
-# colnames(socm_inflation_ts) <- 'socm_e_cpi_1y_ahead'
 
-# # importing the actual and expected consumers sentiments indexes
-# socm_indexes <- read_csv('http://www.sca.isr.umich.edu/files/tbqiccice.csv', 
-#                          col_types = cols(QUARTER = col_character(),
-#                                           YYYY = col_integer(),
-#                                           ICC = col_double(),
-#                                           ICE = col_double()
-#                                           ))
+# consumers' expected inflation, 5 years ahead
+req_fields[['table']] <- '33'
 
-# # creating three series, adding the difference btw actual and expected
-# indexes <- cbind(socm_indexes$ICC, socm_indexes$ICE, (socm_indexes$ICC - socm_indexes$ICE))
+socm_5y_inflation <- POST(url = 'https://data.sca.isr.umich.edu/data-archive/mine.php',
+                  body = req_fields,
+                  encode = 'form', verbose()
+                  ) %>% 
+            content('parsed') %>%
+            rvest::html_table() %>% 
+            .[[2]] %>% 
+            select(X13, X15) %>% 
+            .[-1,] %>% 
+            ts(start = c(1960, 1), frequency = 4) %>%
+            xts(order.by = time(.) %>% as.Date()) %>% 
+            rename(X13 = socm_5y_inflation_mean,
+                 X14 = socm_5y_inflation_var)
 
-# socm_indexes_ts <- as.xts(ts(indexes, start=c(1960, 1), frequency=4,
-#                              names=c('soc_actual_ind', 'soc_expected_ind','soc_diff_ind')))
 
-# # creates the percentage variations from SOC levels, period over period
+# consumer confidence indexes + transformations
+req_fields[['table']] <- '5'
 
-# g_indexes_rates <- diff(log(socm_indexes_ts[,1:2]))*100
-# colnames(g_indexes_rates) <- c('soc_perch_actual_ind', 'soc_perch_expected_ind')
+socm_indexes <- POST(url = 'https://data.sca.isr.umich.edu/data-archive/mine.php',
+                  body = req_fields,
+                  encode = 'form', verbose()
+                  ) %>% 
+            content('parsed') %>%
+            rvest::html_table() %>% 
+            .[[2]] %>% 
+            select(X8, X9) %>% 
+            .[-1,] %>% 
+            ts(start = c(1960, 1), frequency = 4) %>%
+            xts(order.by = time(.) %>% as.Date()) %>% 
+            rename(X13 = socm_actual_ind,
+                 X14 = socm_expected_ind) %>% 
 
-# SOC_Michigan <- merge(socm_inflation_ts,
-#                       socm_indexes_ts,
-#                       g_indexes_rates)
+            # create deviations from expected index
+            # percentage deviations from previous level
+            # of the indexes, actual and expected
+            mutate(soc_diff_ind = socm_actual_ind - socm_expected_ind,
+                 socm_perch_actual_ind = 100*diff(log(socm_actual_ind)),
+                 socm_perch_expected_ind = 100*diff(log(socm_expected_ind)))
+
+
+# merge all datafiles together
+SOC_Michigan <- merge(socm_1y_inflation,
+            socm_5y_inflation,
+            socm_indexes)
 
 
 ##### EPU indexes #####
@@ -762,8 +798,8 @@ debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
 spf_corepce, spf_cpi, spf_pce, rev_hist,
 tbill3_ffr, shffr, cfnai,
-# socm_inflation, socm_indexes, indexes, socm_indexes_ts,
-# socm_inflation_ts, g_indexes_rates, SOC_Michigan,
+socm_inflation, socm_indexes, socm_indexes, req_fields,
+socm_1y_inflation, socm_5y_inflation, SOC_Michigan,
 short_long_diff, epu_aggregate, epu_aggregate_comp,
 epu_aggregate_comp_ts, epu_aggregate_ts,
 epu_cat, epu_cat_ts, epu, real_cons_exp,
