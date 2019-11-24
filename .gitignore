@@ -9,6 +9,15 @@
 *.txt
 *.Rproj
 
+### custom files
+PDFsam_spf-documentation.pdf
+us_macro_data.Rproj
+possibly_new_stuff.R
+othercount.R
+"EU infl.R"
+UoM_data.py
+
+
 # Session Data files
 .RData
 
