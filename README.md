@@ -2,7 +2,7 @@
 
 Set of scripts previously employed to estimate several specifications of the Fed's monetary policy rule across a variety of econometric methods with post-war data. These scripts are now included in another repository and integrated in more general routines. Therefore, this repository will be modified to host routines automating data collection, cleaning, assembling, posting, and reporting.
 
-#### Todo list
+<!-- #### Todo list
 	* strip off the unnecessary scripts
 	* extend variables included in the DB
 	* reduce econometrics to what's essential
@@ -39,6 +39,6 @@ Highly automated, this set of scripts downloads, assembles macroeconomic time se
 	+ re-script USreg to output regs of interest-> switch to lapply
 	+ extend regressions$formula and regressions$models to accommodate three splits
 	+ ~~possibly add bootstrapping~~ -- no: it crashes outcorr?
-	+ fork a version with static date so to have more stable estimates: mid august 2018 
+	+ fork a version with static date so to have more stable estimates: mid august 2018  -->
 	
 	
