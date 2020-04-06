@@ -8,7 +8,7 @@
 *.xls
 *.txt
 *.Rproj
-!./Processed\ data/*
+!Processed\ data/*
 
 ### custom files
 PDFsam_spf-documentation.pdf
