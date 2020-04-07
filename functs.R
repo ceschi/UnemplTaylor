@@ -7,7 +7,7 @@ instant_pkgs <- function(pkgs) {
   ## Function loading or installing packages in
   ## current R instance.
   ## Developed by Jaime M. Montana Doncel - V1
-
+  
   
   pkgs_miss <- pkgs[which(!pkgs %in% installed.packages()[, 1])]
   if (length(pkgs_miss) > 0) {
@@ -54,7 +54,7 @@ rollm <- function(df, formula){
   cofs <- as.tibble(coefficients(lmod)[2:(lmod %>% coefficients() %>% 
                                             t() %>% ncol()),1] %>% t())
   SD2 <- as.tibble(2*coefficients(lmod)[2:(lmod %>% coefficients() %>% 
-                                            t() %>% ncol()),2] %>% t())
+                                             t() %>% ncol()),2] %>% t())
   
   # adds suffix for bands
   names(SD2) <- paste0(names(SD2), '.SD2')
@@ -90,7 +90,7 @@ rolloop <- function(df, window=8, lags=1){
   regs <- xts(regs, frequency=4, 
               order.by=index(df)[window:length(index(df))])
   
-return(regs)
+  return(regs)
 }
 
 
@@ -293,7 +293,7 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
   
   if (log) tseries <- log(tseries)
   
-  if (class(tseries) %in% c('zoo', 'ts', 'xts')){
+  if (class(tseries)[1] %in% c('zoo', 'ts', 'xts')){
     #### Prepping data ####
     
     # keep the time index
@@ -369,10 +369,9 @@ pkgs <- c('glue',
           'lubridate',
           'readxl',
           'tbl2xts',
-          'tictoc')
+          'tictoc',
+          'httr')
 # fill pkgs with names of the packages to install
-
-devtools::install_github('sboysel/fredr')
 
 instant_pkgs(pkgs)
 

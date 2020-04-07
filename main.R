@@ -15,15 +15,11 @@ flag___singular = 0
 # 1 -- graphs are not printed but only produced and stocked
 flag___plot = 1
 
+# load minimal libs
+library(tictoc)
 
 
-#### Functions #####
-source('functs.R', verbose=F, echo=F)
-
-#### Directories
-source('directories.R', verbose=F, echo=F)
-
-#### DATA COLLECTION, SCRAPING, MANIPULATION ####
+#### DATA COLLECTION, SCRAPING, MANIPULATION ###################################
 # US Data
 # pick ahead to set how many quarters ahead 
 # to consider for SPF forecasts:
@@ -37,13 +33,16 @@ source('directories.R', verbose=F, echo=F)
 # !!!! - internalise multiple horizons
 tic('Whole process')
 tic('Data collection')
-ahead <- 1
-source("USdatacoll.R", verbose=F, echo=F)
+source("USdata_coll.R", verbose=F, echo=F)
+toc()
+
+##### FRED-MQD #################################################################
+tic('Data from MD & QD')
+source('fred_m_q_d.R', verbose = F, echo = F)
 toc()
 
 
-
-##### VISUALIZATION ####
+##### VISUALIZATION ############################################################
 tic('Visuals')
 source('visuals.R', verbose=F, echo=F)
 toc()

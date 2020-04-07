@@ -1,19 +1,315 @@
-# This code collects and scraps core data for the analysis
-# and puts it in xts format
+##### US DATA COLLECTOR ########################################################
 
-if (flag___singular == 1){
+# This script collects, updates and harmonises data on the US economy from
+# a wide variety of sources. To be selfcontained and reused within other
+# scripts, it also contains all functions and flags subsequently used
+
+# Written by Emanuele Franceschi - 07/04/2020 v1
+
+
+##### I - create directories ###################################################
+working_directory <- getwd()
+temp_dir <- 'downloaded_files'
+data_dir <- 'processed_data'
+graphs_dir <- 'plots'
+
+temp_dir <- file.path(working_directory, temp_dir)
+data_dir <- file.path(working_directory, data_dir)
+graphs_dir <- file.path(working_directory, graphs_dir)
+
+options(warn=-1) # turns off warnings momentarily
+dir.create(temp_dir)
+dir.create(data_dir)
+dir.create(graphs_dir)
+options(warn=0) # turns warnings back on
+
+##### II - Custom functions ####################################################
+
+# install/load packages
+instant_pkgs <- function(pkgs) { 
+  ## Function loading or installing packages in
+  ## current R instance.
+  ## Developed by Jaime M. Montana Doncel - V1
   
-  cat('Single file execution')
-  source('directories.R')
-  source('functs.R')
   
-  # selector for the lead in SPF
-  ahead <- 1
+  pkgs_miss <- pkgs[which(!pkgs %in% installed.packages()[, 1])]
+  if (length(pkgs_miss) > 0) {
+    install.packages(pkgs_miss)
+  }
+  
+  if (length(pkgs_miss) == 0) {
+    message("\n ...Packages were already installed!\n")
+  }
+  
+  # install packages not already loaded:
+  pkgs_miss <- pkgs[which(!pkgs %in% installed.packages()[, 1])]
+  if (length(pkgs_miss) > 0) {
+    install.packages(pkgs_miss)
+  }
+  
+  # load packages not already loaded:
+  attached <- search()
+  attached_pkgs <- attached[grepl("package", attached)]
+  need_to_attach <- pkgs[which(!pkgs %in% gsub("package:", "", attached_pkgs))]
+  
+  if (length(need_to_attach) > 0) {
+    for (i in 1:length(need_to_attach))  suppressPackageStartupMessages(library(need_to_attach[i], character.only = TRUE))
+  }
+  
+  if (length(need_to_attach) == 0) {
+    message("\n ...Packages were already loaded!\n")
+  }
+}
+
+##### Packages Loader #####
+# fill pkgs with names of the packages to install
+instant_pkgs(
+			c(
+		  'glue', 
+          'lazyeval',
+          'quantreg', 
+          'tidyverse',
+          'devtools',
+          'tseries',
+          'stargazer',
+          'xts',
+          'MASS',
+          'car',
+          'rvest',
+          'mFilter',
+          'fredr',
+          'readr',
+          'quantmod',
+          'devtools',
+          'lubridate',
+          'readxl',
+          'tbl2xts',
+          'tictoc',
+          'httr'
+          )
+		)
+
+subfilter <- function(df){
+  # function to convert a df with multiple observations per unit
+  # of time in a df with one observation per unit of time,
+  # namely the last one among those previously present
+  
+  
+  indice <- as.character(unique(df$date))
+  len <- length(indice)
+  outp <- matrix(NA, ncol=ncol(df), nrow=len)
+  outp <- data.frame(outp)
+  names(outp) <- names(df)
+  for (i in 1:len){
+    supp <- indice[i]
+    ram <- subset(df, date==supp)
+    outp[i,] <- ram[nrow(ram),]
+    outp[i,1] <- indice[i]
+  }
+  return(outp)
 }
 
 
-#### Scraping US data ####
+subfilter.mean <- function(df){
+  # function to convert a df with multiple observations per unit
+  # of time in a df with one observation per unit of time,
+  # namely the mean of those previously present
+  
+  
+  indice <- as.character(unique(df$date))
+  len <- length(indice)
+  outp <- matrix(NA, ncol=ncol(df), nrow=len)
+  outp <- data.frame(outp)
+  names(outp) <- names(df)
+  for (i in 1:len){
+    supp <- indice[i]
+    ram <- subset(df, date==supp)
+    outp[i,] <- c(0, as.numeric(apply(ram[,-1], 2, mean)))
+  }
+  outp[,1] <- indice
+  return(outp)
+}
 
+
+trendev<-function(mat){
+  # for multiple observation in particular shape, this function
+  # estimates a quadratic trend on the available series and consider
+  # the deviation from the trend in the last observation. This deviation
+  # is put into another time series. The purpose of this function is to
+  # extract real time output gap from Philadelphia dataset.
+  
+  
+  matdat<-mat[,2:ncol(mat)]
+  temp<-1:nrow(mat)
+  temp2<-temp^2
+  regr<-function(x){
+    dta<-data.frame(x, temp, temp2)
+    names(dta)<-c('x', 'temp', 'temp2')
+    model<-lm(x~temp+temp2, data=dta)
+    GAPS<-(model$residuals/(x-model$residuals))
+    gaps<-as.matrix(na.omit(GAPS))
+    gap<-gaps[nrow(gaps)]
+    return(gap)
+  }
+  outcome<-apply(matdat, 2, regr)
+  outcome<-as.matrix(outcome)
+  return(outcome*100)
+}
+
+spf_funct <-  function(filnam, typs, ahead=1) {
+  # this function imports the files, reformats,
+  # renames, saves in raw format and produces
+  # aggregate statistics in XTS format
+  
+  # read in xlsx files and reshape w\ spread
+  # this block selects one quarter ahead forecasts
+  # but adjusting 'ahead' parameter below one can
+  # extract other values
+  
+  # ad-hoc function inconsistent w/ external use
+  # typs is one of CPI, CORECPI, PCE, COREPCE
+  
+  
+  # 'ahead' allows to select the horizon of 
+  # forecasts one wishes to extract:
+  # -1 for previous quarter estimates
+  # 0 for nowcast
+  # 1 for one quarter ahead -- default
+  # 2 for two quarters ahead
+  # 3 for three quarters ahead
+  # 4 for one year ahead
+  
+  typ=tolower(typs)
+  
+  colu=c(rep('numeric',3),  # picks year, quarter, ID
+         rep('skip', 2+ahead),	 # skips industry
+         'numeric',				 # moving target picking 'ahead' horizon
+         rep('skip', 7-ahead)	 # skips the rest
+  )
+  
+  df=read_excel(file.path(temp_dir,filnam), 
+                na='#N/A', col_types=colu) %>%
+    spread(ID, paste0(typs,ahead+2)) %>% 
+    ts(start=c(1968, 4), frequency=4) %>%
+    as.xts()
+  
+  pst=paste0(typ,'_')
+  if (ahead==-1){
+    pst=paste0(pst,'b1')
+  } 	else {
+    pst=paste0(pst,'h') %>% paste0(ahead)
+  }
+  
+  names(df)=c('year', 'quarter', paste(pst, (1:(ncol(df)-2)), sep='_'))
+  
+  df$year <- df$quarter <- NULL
+  
+  # saving in txt csv format the raw data
+  write.zoo(df, file.path(data_dir, paste(paste0('SPF_IND_',pst),'txt', sep='.')), sep=';', row.names=F, index.name='time')
+  
+  
+  iqr <- apply(df, 1, IQR, na.rm=TRUE) %>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
+  stand<-apply(df, 1, var, na.rm=T) %>% sqrt()%>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
+  mean<-apply(df, 1, mean, na.rm=T)%>% ts(start=c(1968, 4), frequency=4) %>% as.xts()
+  mean[is.nan(mean)] <- NA
+  
+  lab <- paste0('spf_', pst)
+  
+  df_stat=merge(iqr, stand, mean)
+  names(df_stat)=paste(lab, c('iqr', 'sd', 'mean'), sep='_')
+  
+  
+  return(df_stat)
+}
+
+
+hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
+  
+  # test code 
+  # 
+  # tseries <- c(rep(NA, 2), rnorm(200, 3, 3), rep(NA, 8))
+  # 
+  # tseries <- ts(tseries, frequency = 4, start = c(1900, 01))
+  # 
+  # h <- 8
+  # p <- 4
+  
+  
+  # R implementation of Hamilton's replacement
+  # for time series filtering, to use for the same
+  # purposes of Hodrick-Prescott Filter.
+  #
+  # Reference: James Hamilton, "Why you should never use the Hodrick-Prescott Filter", 2017, NBER Working Paper
+  
+  # ts: the time series to filter out of the trend
+  # p : the number of lags to include 
+  # h : the forward term
+  
+  # the model to estimate is then:
+  # y_{t+h} = \alpha + \beta_1 y_{t} + \beta_2 y_{t-1} + ... + \beta_p y_{t-p}
+  #
+  # and this function will output the residuals of this regression
+  
+  
+  ##### Libraries #####
+  if (!require(xts)){install.packages('xts')}
+  
+  library(xts)
+  
+  if (log) tseries <- log(tseries)
+  
+  if (class(tseries)[1] %in% c('zoo', 'ts', 'xts')){
+    #### Prepping data ####
+    
+    # keep the time index
+    time_ind <- time(tseries)
+    
+    # get rid of leading and trailing NA's
+    ts <- na.trim(tseries)
+    
+    time_ind_trim <- time(ts)
+    
+    # count remaining NA, barf in case
+    nas_count <- sum(is.na(ts))
+    
+    if (nas_count>=1) stop('NAs in the series!') 
+    if (length(ts)<= h+p) stop('Too few observations: you might want to decrease p and h.')
+    
+    
+    # lag data
+    lagged_ts <- embed(ts, dimension = h+p-1)
+    lagged_ts <- as.data.frame(lagged_ts)
+    names(lagged_ts) <- paste0('x', 1:(h+p-1))
+    
+    # dump useless cols
+    lagged_ts <- lagged_ts[,-(2:(h-1))]
+    
+    #### Running lm's ####
+    model <- lm(lagged_ts)
+    residuals <- resid(model)*100/model$model$x1
+    
+    
+    #### date up correctly residuals ####
+    residuals <- xts(residuals, order.by = as.Date(time_ind_trim)[-(1:(p+h-2))])
+    
+    return(residuals)
+  }else{warning('Provide a time series object!')}
+}
+
+
+
+
+##### III - Actual data collection #############################################
+
+# pick ahead to set how many quarters ahead 
+# to consider for SPF forecasts:
+# -1 for previous quarter estimates
+# 0 for nowcast
+# 1 for one quarter ahead -- default
+# 2 for two quarters ahead
+# 3 for three quarters ahead
+# 4 for one year ahead
+ahead <- 1
 
 #### FEDERAL INTEREST RATE ####
 
@@ -36,6 +332,8 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-ti
               file.path(temp_dir,'Greenbook_allvar_row.xlsx'), mode='wb',
               extra='--no-check-certificate',
               quiet = T)
+
+### !!! EMAIL TO FED TO REQUIRE UPDATE !!!
 
 # reads the single interesting sheets and
 # imports them in df format
@@ -109,32 +407,32 @@ rev_hist <- merge(
           # Consumer Price Index for All Urban Consumers: All Items 
           rev_pci = fredr_series_observations(series_id='CPIAUCSL', 
                                           frequency='q', 
-                                        # aggregation_method='eop', 
-                                        units='pc1') %>% tbl_xts(), 
+                                        aggregation_method='eop',
+                                        units='cca') %>% tbl_xts(), 
           
           # Consumer Price Index for All Urban Consumers: All Items Less Food and Energy
           rev_pci_fe  = fredr_series_observations(series_id='CPILFESL', 
                                             frequency='q', 
-                                            # aggregation_method='eop', 
-                                            units='pc1') %>% tbl_xts(),
+                                            aggregation_method='eop',
+                                            units='cca') %>% tbl_xts(),
           
           # Gross Domestic Product: Implicit Price Deflator
           rev_defl = fredr_series_observations(series_id='GDPDEF', 
                                           frequency='q', 
-                                         # aggregation_method='eop', 
-                                         units='pc1') %>% tbl_xts(),
+                                         aggregation_method='eop',
+                                         units='cca') %>% tbl_xts(),
           
           # Personal Consumption Expenditures including Food and Energy
           rev_pce  = fredr_series_observations(series_id='PCEPI', 
                                              frequency='q', 
-                                         # aggregation_method='eop', 
-                                         units='pc1') %>% tbl_xts(),
+                                         aggregation_method='eop',
+                                         units='cca') %>% tbl_xts(),
           
           # Personal Consumption Expenditures Excluding Food and Energy
           rev_pce_fe  = fredr_series_observations(series_id='PCEPILFE', 
                                             frequency='q', 
-                                            # aggregation_method='eop', 
-                                            units='pc1') %>% tbl_xts()
+                                            aggregation_method='eop',
+                                            units='cca') %>% tbl_xts()
 ) 
 # renames variables
 names(rev_hist) <-  c('rev_cpi', 'rev_cpi_fe', 'rev_defl',
@@ -143,19 +441,31 @@ names(rev_hist) <-  c('rev_cpi', 'rev_cpi_fe', 'rev_defl',
 
 ## UNEMPLOYMENT METRICS ####
 
-claims <- fredr_series_observations(series_id='ICSA', frequency='q', aggregation_method='sum') %>% tbl_xts()
+claims <- fredr_series_observations(series_id='ICSA', 
+                                    frequency='q', 
+                                    aggregation_method='sum') %>% 
+                                      tbl_xts()
 # initial claims, number
 
-natural_unemp_short <- fredr_series_observations(series_id='NROUST', frequency='q') %>% tbl_xts()
+natural_unemp_short <- fredr_series_observations(series_id='NROUST', 
+                                                 frequency='q') %>% 
+                                      tbl_xts()
 # natural employment on the short run
 
-natural_unemp_long <- fredr_series_observations(series_id='NROU', frequency='q') %>% tbl_xts()
+natural_unemp_long <- fredr_series_observations(series_id='NROU', 
+                                                frequency='q') %>% 
+                                      tbl_xts()
 # longer term natural unemployment rate
 
-current_unemp <- fredr_series_observations(series_id='UNRATE', frequency='q') %>% tbl_xts()
+current_unemp <- fredr_series_observations(series_id='UNRATE', 
+                                           frequency='q') %>% 
+                                      tbl_xts()
 # current unemployment rate
 
-tot_emp <- fredr_series_observations(series_id='PAYEMS', frequency='q') %>% tbl_xts() %>% `*`(.,1000)
+tot_emp <- fredr_series_observations(series_id='PAYEMS', 
+                                     frequency='q') %>% 
+                                      tbl_xts() %>% 
+                                        `*`(.,1000)
 # total employed, thousands
 
 ## Unemployment manipulation
@@ -179,7 +489,7 @@ capacity <- fredr_series_observations(series_id='GDPPOT', frequency='q') %>% tbl
 actual <- fredr_series_observations(series_id='GDPC1', frequency='q') %>% tbl_xts()
 # actual gdp
 
-gap_expost <- (actual-capacity)*100/capacity
+gap_expost <- (actual-capacity)*100/capacity 
 
 # real time gap
 
@@ -193,10 +503,6 @@ gdp_waves <- read_excel(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'),
 cols <- ncol(gdp_waves)
 
 options(warn=-1) # line below produces more than 50 warnings as it produces NAs, which I want
-
-
-
-
 y_real_gap <- as.xts(ts(trendev(gdp_waves), start=c(1965, 4), frequency = 4))
 
 gap_output <- merge(y_real_gap, gap_expost)
@@ -371,28 +677,42 @@ names(consumption) <- c('real_c',
 ##### SPREADS ####
 
 ## BAA 10Y bonds        !!! - DISCONTINUED BY FRED - !!!
-spread_baa <- fredr_series_observations(series_id='BAA10Y', frequency='q') %>% tbl_xts()
+spread_baa <- fredr_series_observations(series_id='BAA10Y', 
+                                        frequency='q', 
+                                        aggregation_method = 'eop') %>% tbl_xts()
 
 ## BAA 20+ year bonds rate
-baa <- fredr_series_observations(series_id = 'BAA', frequency = 'q') %>% tbl_xts()
+baa <- fredr_series_observations(series_id = 'BAA', frequency
+                                 = 'q', 
+                                 aggregation_method = 'eop') %>% tbl_xts()
 
 ## AAA 20+ year bonds rate
-aaa <- fredr_series_observations(series_id = 'AAA', frequency = 'q') %>% tbl_xts()
+aaa <- fredr_series_observations(series_id = 'AAA', frequency
+                                 = 'q', 
+                                 aggregation_method = 'eop') %>% tbl_xts()
 
 ## 3 months Tbill rate
-tbill_rate_3m <- fredr_series_observations(series_id='TB3MS',frequency='q') %>% tbl_xts()
+tbill_rate_3m <- fredr_series_observations(series_id='TB3MS',
+                                           frequency='q', 
+                                           aggregation_method = 'eop') %>% tbl_xts()
 
 ## 1 year
-tbill_rate_1y <- fredr_series_observations(series_id='DGS1', frequency='q') %>% tbl_xts()
+tbill_rate_1y <- fredr_series_observations(series_id='DGS1', 
+                                           frequency='q', 
+                                           aggregation_method = 'eop') %>% tbl_xts()
 
 ## 10 years 
-tbill_rate_10y <- fredr_series_observations(series_id='DGS10',frequency='q') %>% tbl_xts()
+tbill_rate_10y <- fredr_series_observations(series_id='DGS10',
+                                            frequency='q', 
+                                            aggregation_method = 'eop') %>% tbl_xts()
+
+
 
 
 ## spread btw 3m tbill and FFR
-tbill3_ffr <- fredr_series_observations(series_id='TB3SMFFM', frequency='q', aggregation_method='eop') %>% tbl_xts()
-
-
+tbill3_ffr <- fredr_series_observations(series_id='TB3SMFFM', 
+                                        aggregation_method = 'eop',
+                                        frequency = 'q') %>% tbl_xts()
 
 options("getSymbols.warning4.0"=FALSE)
 options("getSymbols.yahoo.warning"=FALSE)# disables disclaimer about version update
@@ -480,6 +800,7 @@ debt_g <- diff(log(debt_lev))*100
 debt_fed <- fredr_series_observations(series_id = 'FDHBFRBN', frequency='q') %>% tbl_xts()
 
 
+
 # percentage of debt held by FED
 debt_fed_share <- 100*(debt_fed*1000/debt_lev)
 
@@ -563,15 +884,51 @@ download.file(#url = 'http://faculty.chicagobooth.edu/jing.wu/research/data/poli
 shffr <- read_excel(path = file.path(temp_dir,'wuxia_dwnl.xls'),
                     col_names = c('date', 'shffr'),
                     sheet = 'Sheet1')
+
 # the above lines download the xls file and dataframe it
 
 #### conversion to xts ####
 
 shffr <- shffr$shffr
 shffr <- as.xts(ts(shffr, frequency = 12, start=c(1960, 1)))
-shffr <- aggregate(shffr, as.yearqtr(as.yearmon(time(shffr))), mean)
-shffr <- merge(shffr, lag(shffr, 1))
+shffr <- aggregate(shffr, as.yearqtr(as.yearmon(time(shffr))), xts::last) %>% as.xts()
+
+
+# stitching
+shffr_ext <- ffr
+shffr_ext["2007/2015"] <- shffr["2007/2015"]
+
+shffr <- merge(shffr_ext, lag(shffr_ext, 1))
 names(shffr) <- c('shffr', 'shffrb')
+
+
+
+##### Krippner's shadow rate ###################################################
+
+# download xlsx file
+download.file(url = 'https://www.rbnz.govt.nz/-/media/ReserveBank/Files/Publications/Research/additional-research/leo-krippner/us-ea-jp-uk-ssrs-monthly-update.xlsx?la=en&revision=a1d77cad-e95c-47cb-b15d-73b5a6d719fa',
+              destfile = file.path(temp_dir, "krippner_dwnl.xlsx"),
+              mode = "wb",
+              quiet = T)
+
+# read in US data only
+kripp_ffr <- read_excel(path = file.path(temp_dir, 'krippner_dwnl.xlsx'),
+                        sheet = 2,
+                        range = "A7:B303", 
+                        col_names = c('date', 'kripp_shffr'),
+                        col_types = c('date', 'numeric')) %>% 
+  xts(x = .$kripp_shffr, order.by = as.Date(.$date))
+
+kripp_ffr <- aggregate(kripp_ffr, as.yearqtr(as.yearmon(time(kripp_ffr))), xts::last) %>% xts()
+
+
+
+# stitching
+kripp_ext <- ffr
+kripp_ext["1995/2019-08"] <- kripp_ffr
+
+kripp_ffr <- merge(kripp_ext, lag(kripp_ext, 1))
+names(kripp_ffr) <- c("kripp_shffr", "kripp_shffrb")
 
 
 ##### Un. of Michigan Surveys of Consumers #######
@@ -739,10 +1096,6 @@ epu <- merge(epu_aggregate_ts,
              epu_aggregate_comp_ts,
              epu_cat_ts)
 
-
-
-
-
 #### Merge to dataset ####
 
 db_US <- merge(rates, 
@@ -756,38 +1109,33 @@ db_US <- merge(rates,
                fiscal,
                spf,
                shffr,
+               kripp_ffr,
                SOC_Michigan,
                epu)
+
+#### Quarterly dummies to account for seasonality
+
+dums <- xts(x = data.frame(q1 = rep(c(1,0,0,0), floor(length(index(db_US)))/4),
+                           q2 = rep(c(0,1,0,0), floor(length(index(db_US)))/4),
+                           q3 = rep(c(0,0,1,0), floor(length(index(db_US)))/4)),
+            order.by = index(db_US)
+)
+
+db_US <- merge(db_US, dums)
+
+# date harmonisation
 
 db_US <- db_US %>% 
   tbl2xts::xts_tbl() %>% 
   dplyr::mutate(date = as.Date(index(db_US))) %>% 
   tbl2xts::tbl_xts()
 
+# write to disk
 write.zoo(x=db_US, 
           file=file.path(data_dir, 'US_data.txt'), 
           sep=';', 
           row.names=F, 
           index.name='date')
-
-
-
-
-
-#### Other countries ####
-
-# UK
-# Canada
-# Norway
-# Denmark
-# Japan
-# Israel
-# Mexico
-# Finland
-# S Korea
-# Sweden
-
-
 
 
 
@@ -807,7 +1155,7 @@ debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
 surplus_gdp, surplus_season, spf, spf_corecpi,
 spf_corepce, spf_cpi, spf_pce, rev_hist,
 tbill3_ffr, shffr, cfnai,
-socm_inflation, socm_indexes, socm_indexes, req_fields,
+socm_indexes, req_fields,
 socm_1y_inflation, socm_5y_inflation, SOC_Michigan,
 short_long_diff, epu_aggregate, epu_aggregate_comp,
 epu_aggregate_comp_ts, epu_aggregate_ts,
@@ -820,7 +1168,6 @@ cons_serv_g,cons_serv_filtered,
 cons_FE,cons_FE_g,cons_FE_filtered,
 cons_gvt,cons_gvt_g,cons_gvt_filtered,
 cons_defense,cons_defense_g,cons_defense_filtered,
-
-
+kripp_ffr, kripp_ext, shffr_ext,
+dums,
 consumption)
-if (flag___singular == 1) rm(ahead)
