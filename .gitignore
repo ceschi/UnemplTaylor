@@ -9,6 +9,7 @@
 *.txt
 *.Rproj
 !processed_data/US_data.txt
+USdatacollOLD.R
 
 ### custom files
 PDFsam_spf-documentation.pdf
