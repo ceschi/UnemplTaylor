@@ -65,26 +65,14 @@ instant_pkgs <- function(pkgs) {
 # fill pkgs with names of the packages to install
 instant_pkgs(
 			c(
-		  'glue', 
-          'lazyeval',
-          'quantreg', 
           'tidyverse',
-          'devtools',
-          'tseries',
-          'stargazer',
           'xts',
-          'MASS',
-          'car',
           'rvest',
-          'mFilter',
           'fredr',
-          'readr',
           'quantmod',
-          'devtools',
           'lubridate',
           'readxl',
           'tbl2xts',
-          'tictoc',
           'httr'
           )
 		)
