@@ -663,10 +663,7 @@ spread_baa <- fredr_series_observations(series_id='BAA10Y',
                                         frequency='q', 
                                         aggregation_method = 'eop') %>% tbl_xts()
 
-## BAA 20+ year bonds rate
-baa <- fredr_series_observations(series_id = 'BAA', frequency
-                                 = 'q', 
-                                 aggregation_method = 'eop') %>% tbl_xts()
+
 
 ## AAA 20+ year bonds rate
 aaa <- fredr_series_observations(series_id = 'AAA', frequency
@@ -721,11 +718,6 @@ sp_ret <- as.xts(aggregate(sp_ret, as.yearqtr(as.yearmon(time(sp_ret))), mean))
 # spread_sp <- (sp_ret - one_year)
 spread_sp_3m <- sp_ret - tbill_rate_3m
 
-# replicate spread from moody's
-spread_baa_long <- baa - tbill_rate_10y
-
-# quality spread
-spread_baa_aaa <- baa - aaa
 
 # corp vs treas spread
 spread_aaa <- aaa - tbill_rate_10y
@@ -733,13 +725,11 @@ spread_aaa <- aaa - tbill_rate_10y
 spreads <- merge(spread_baa, spread_sp_3m, 
                  tbill3_ffr, tbill_rate_3m,
                  tbill_rate_1y, tbill_rate_10y,
-                 spread_baa_long, spread_baa_aaa,
-                 spread_aaa, aaa, baa)
+                 spread_aaa, aaa)
 names(spreads) <- c('spread_baa', 'spread_sp_3m',
                     'tbill3_ffr', 'tbill_rate_3m',
                     'tbill_rate_1y', 'tbill_rate_10y',
-                    'spread_baa_long', 'spread_baa_aaa',
-                    'spread_aaa', 'aaa', 'baa')
+                    'spread_aaa', 'aaa')
 
 options("getSymbols.warning4.0"=T) # activates disclaimer v0.4
 
@@ -1129,7 +1119,7 @@ current_unemp, tot_emp, layoffs, employment_fluct,
 cols, gdp_waves, rates, ffrate, unemployment, gap_output,
 spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
-spread_baa_long, spread_baa_aaa, spread_aaa, aaa, baa,
+spread_aaa, aaa,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
 base, m1, m2, m3, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
