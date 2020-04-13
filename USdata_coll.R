@@ -64,18 +64,18 @@ instant_pkgs <- function(pkgs) {
 ##### Packages Loader #####
 # fill pkgs with names of the packages to install
 instant_pkgs(
-			c(
-          'tidyverse',
-          'xts',
-          'rvest',
-          'fredr',
-          'quantmod',
-          'lubridate',
-          'readxl',
-          'tbl2xts',
-          'httr'
-          )
-		)
+ c(
+  'fredr',
+  'httr',
+  'lubridate',
+  'quantmod',
+  'readxl',
+  'rvest',
+  'tbl2xts',
+  'tidyverse',
+  'xts'
+  )
+ )
 
 subfilter <- function(df){
   # function to convert a df with multiple observations per unit
@@ -97,7 +97,6 @@ subfilter <- function(df){
   return(outp)
 }
 
-
 subfilter.mean <- function(df){
   # function to convert a df with multiple observations per unit
   # of time in a df with one observation per unit of time,
@@ -117,7 +116,6 @@ subfilter.mean <- function(df){
   outp[,1] <- indice
   return(outp)
 }
-
 
 trendev<-function(mat){
   # for multiple observation in particular shape, this function
@@ -210,7 +208,6 @@ spf_funct <-  function(filnam, typs, ahead=1) {
   return(df_stat)
 }
 
-
 hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
   
   # test code 
@@ -283,9 +280,6 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
     return(residuals)
   }else{warning('Provide a time series object!')}
 }
-
-
-
 
 ##### III - Actual data collection #############################################
 
