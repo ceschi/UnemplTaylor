@@ -493,6 +493,7 @@ names(gap_output) <- c('realtime_gap', 'expost_gap')
 options(warn=0) # reactivates warnings
 
 cfnai <- fredr_series_observations(series_id = 'CFNAI', frequency = 'q') %>% tbl_xts()
+names(cfnai) <- 'cfnai'
 
 ##### Consumption #####
 # work in progress
