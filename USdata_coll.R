@@ -312,7 +312,8 @@ ffrate <- merge(ffr, ffrb)
 # a specifically created folder
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/greenbook-data/documentation/gbweb_row_format.xls?la=en',
               file.path(temp_dir,'Greenbook_allvar_row.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 ### !!! EMAIL TO FED TO REQUIRE UPDATE !!!
@@ -515,7 +516,8 @@ gap_expost <- (actual-capacity)*100/capacity
 
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/real-time-data/data-files/files/xlsx/routputqvqd.xlsx?la=en',
               file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 gdp_waves <- read_excel(file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), 
@@ -843,25 +845,29 @@ money <-  merge(money, money_g)
 # download CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download CORE CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download PCE inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download CORE PCE inflation rate file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb',
-              extra='--no-check-certificate',
+              method = 'curl',
+              extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 
