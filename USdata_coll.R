@@ -290,6 +290,7 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
 }
 
 devtools::install_github('sboysel/fredr', force = TRUE)
+library(fredr)
 
 ##### III - Actual data collection #############################################
 
