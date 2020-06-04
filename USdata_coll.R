@@ -23,6 +23,15 @@ dir.create(data_dir)
 dir.create(graphs_dir)
 options(warn=0) # turns warnings back on
 
+# Philly Fed's certificate is trash,
+# needs lower security standard 
+# and os dependency
+if (Sys.info()['sysname'] == 'Linux'){
+	meth_philly <- 'curl'
+}else{
+	meth_philly <- 'auto'
+}
+
 ##### II - Custom functions ####################################################
 
 # install/load packages
@@ -65,7 +74,6 @@ instant_pkgs <- function(pkgs) {
 # fill pkgs with names of the packages to install
 instant_pkgs(
  c(
-  'fredr',
   'httr',
   'lubridate',
   'quantmod',
@@ -281,6 +289,8 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
   }else{warning('Provide a time series object!')}
 }
 
+devtools::install_github('sboysel/fredr', force = TRUE)
+
 ##### III - Actual data collection #############################################
 
 # pick ahead to set how many quarters ahead 
@@ -312,7 +322,7 @@ ffrate <- merge(ffr, ffrb)
 # a specifically created folder
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/greenbook-data/documentation/gbweb_row_format.xls?la=en',
               file.path(temp_dir,'Greenbook_allvar_row.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
@@ -516,7 +526,7 @@ gap_expost <- (actual-capacity)*100/capacity
 
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/real-time-data/data-files/files/xlsx/routputqvqd.xlsx?la=en',
               file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
@@ -845,28 +855,28 @@ money <-  merge(money, money_g)
 # download CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download CORE CPI inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download PCE inflation rate raw file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
 # download CORE PCE inflation rate file for individuals in the SPF
 download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
               file.path(temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb',
-              # method = 'curl',
+              method = meth_philly,
               extra='--ciphers DEFAULT@SECLEVEL=1',
               quiet = T)
 
