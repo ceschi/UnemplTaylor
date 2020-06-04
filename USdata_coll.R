@@ -289,7 +289,9 @@ hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
   }else{warning('Provide a time series object!')}
 }
 
-devtools::install_github('sboysel/fredr', force = TRUE)
+if (!('fredr' %in% installed.packages()[,1])){
+  devtools::install_github('sboysel/fredr', force = TRUE)
+}
 library(fredr)
 
 ##### III - Actual data collection #############################################
@@ -1198,5 +1200,5 @@ cons_FE,cons_FE_g,cons_FE_filtered,
 cons_gvt,cons_gvt_g,cons_gvt_filtered,
 cons_defense,cons_defense_g,cons_defense_filtered,
 kripp_ffr, kripp_ext, shffr_ext,
-dums,
+dums, meth_philly,
 consumption)
