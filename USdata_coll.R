@@ -302,7 +302,7 @@ ffr <- fredr_series_observations(series_id='FEDFUNDS', frequency='m') %>% tbl_xt
 ffr <- as.xts(aggregate(ffr, as.yearqtr(as.yearmon(time(ffr))), last))
 # aggregates up to quarters picking quarter's last month value
 
-ffrb <- lag(ffr)
+ffrb <- stats::lag(ffr)
 
 ffrate <- merge(ffr, ffrb)
 
@@ -915,7 +915,7 @@ shffr <- aggregate(shffr, as.yearqtr(as.yearmon(time(shffr))), xts::last) %>% as
 shffr_ext <- ffr
 shffr_ext["2007/2015"] <- shffr["2007/2015"]
 
-shffr <- merge(shffr_ext, lag(shffr_ext, 1))
+shffr <- merge(shffr_ext, stats::lag(shffr_ext, 1))
 names(shffr) <- c('shffr', 'shffrb')
 
 
@@ -944,7 +944,7 @@ kripp_ffr <- aggregate(kripp_ffr, as.yearqtr(as.yearmon(time(kripp_ffr))), xts::
 kripp_ext <- ffr
 kripp_ext["1995/2019-08"] <- kripp_ffr
 
-kripp_ffr <- merge(kripp_ext, lag(kripp_ext, 1))
+kripp_ffr <- merge(kripp_ext, stats::lag(kripp_ext, 1))
 names(kripp_ffr) <- c("kripp_shffr", "kripp_shffrb")
 
 
@@ -1022,8 +1022,8 @@ socm_indexes <- POST(url = 'https://data.sca.isr.umich.edu/data-archive/mine.php
                         # percentage deviations from previous level
                         # of the indexes, actual and expected
                         mutate(soc_diff_ind = socm_actual_ind - socm_expected_ind,
-                               socm_perch_actual_ind = 100*diff(log(socm_actual_ind) %>% rbind(NA)),
-                               socm_perch_expected_ind = 100*diff(log(socm_expected_ind)%>% rbind(NA))) %>% 
+                               socm_perch_actual_ind = c(NA, 100*diff(log(socm_actual_ind))),
+                               socm_perch_expected_ind = c(NA, 100*diff(log(socm_expected_ind)))) %>% 
                         ts(start = c(1960, 1), frequency = 4) %>%
                         xts(order.by = time(.) %>% as.Date())
 
