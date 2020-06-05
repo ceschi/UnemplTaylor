@@ -409,7 +409,7 @@ rev_hist_pch <- merge(
           # Consumer Price Index for All Urban Consumers: All Items Less Food and Energy
           rev_pci_fe  = fredr_series_observations(series_id='CPILFESL', 
                                             frequency='q', 
-                                            # aggregation_method='eop',
+                                            aggregation_method='eop',
                                             units='cca') %>% tbl_xts(),
           
           # Gross Domestic Product: Implicit Price Deflator
