@@ -304,7 +304,7 @@ library(fredr)
 # 2 for two quarters ahead
 # 3 for three quarters ahead
 # 4 for one year ahead
-ahead <- 1
+if (!base::exists(x = "ahead", envir = .GlobalEnv)){stop('Provide how many quarters ahead in an "ahead" variable.')}
 
 #### FEDERAL INTEREST RATE ####
 
