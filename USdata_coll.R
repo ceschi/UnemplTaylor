@@ -708,8 +708,12 @@ names(consumption) <- c('real_c',
 # WTISPLC	Spot Crude Oil Price: West Texas Intermediate
 # DCOILBRENTEU	Crude Oil Prices: Brent - Europe
 
-
-
+##### Oil and food commodities #################################################
+oil <- fredr_series_observations(series_id = 'DCOILWTICO',
+                                 frequency = 'q',
+                                 aggregation_method = 'eop') %>% 
+                                 tbl_xts()
+names(oil) <- 'oil_txs'
 
 
 ##### SPREADS ####
@@ -722,8 +726,8 @@ spread_baa <- fredr_series_observations(series_id='BAA10Y',
 
 
 ## AAA 20+ year bonds rate
-aaa <- fredr_series_observations(series_id = 'AAA', frequency
-                                 = 'q', 
+aaa <- fredr_series_observations(series_id = 'AAA',
+                                frequency = 'q', 
                                  aggregation_method = 'eop') %>% tbl_xts()
 
 ## 3 months Tbill rate
@@ -1144,7 +1148,8 @@ db_US <- merge(rates,
                shffr,
                kripp_ffr,
                SOC_Michigan,
-               epu)
+               epu, 
+               oil)
 
 #### Quarterly dummies to account for seasonality
 
@@ -1203,5 +1208,5 @@ cons_gvt,cons_gvt_g,cons_gvt_filtered,
 cons_defense,cons_defense_g,cons_defense_filtered,
 kripp_ffr, kripp_ext, shffr_ext,
 dums, meth_philly,
-consumption,
+consumption, oil,
 xtr)
