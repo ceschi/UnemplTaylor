@@ -29,9 +29,11 @@ options(warn=0) # turns warnings back on
 if (Sys.info()['sysname'] == 'Linux'){
 	meth_philly <- 'curl'
 	xtr  <- NULL
+	wwg <- 'wget'
 }else{
 	meth_philly <- 'auto'
 	xtr  <- '--ciphers DEFAULT@SECLEVEL=1'
+	wwg <- 'auto'
 }
 
 ##### II - Custom functions ####################################################
@@ -915,6 +917,7 @@ download.file(#url = 'http://faculty.chicagobooth.edu/jing.wu/research/data/poli
               url = 'https://drive.google.com/uc?export=download&id=1Z0UdvdPhXaIQNVXTZzYtvxDXwxA6YD2e',
               destfile = file.path(temp_dir, 'wuxia_dwnl.xls'),
               mode = 'wb',
+              method = wwg,
               quiet = T)
 
 shffr <- read_excel(path = file.path(temp_dir,'wuxia_dwnl.xls'),
