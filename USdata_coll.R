@@ -1212,4 +1212,4 @@ cons_defense,cons_defense_g,cons_defense_filtered,
 kripp_ffr, kripp_ext, shffr_ext,
 dums, meth_philly,
 consumption, oil,
-xtr)
+xtr, wwg)
