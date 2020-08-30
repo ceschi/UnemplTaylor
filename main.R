@@ -16,6 +16,7 @@ flag___singular = 0
 flag___plot = 1
 
 # load minimal libs
+if (!require(tictoc)){install.packages('tictoc')}
 library(tictoc)
 
 

@@ -27,7 +27,7 @@ options(warn=0) # turns warnings back on
 # needs lower security standard 
 # and os dependency
 if (Sys.info()['sysname'] == 'Linux'){
-	meth_philly <- 'curl'
+	meth_philly <- 'wget' # or curl
 	xtr  <- NULL
 	wwg <- 'wget'
 }else{
@@ -85,7 +85,8 @@ instant_pkgs(
   'rvest',
   'tbl2xts',
   'tidyverse',
-  'xts'
+  'xts',
+  'devtools'
   )
  )
 
