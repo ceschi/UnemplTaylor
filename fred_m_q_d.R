@@ -9,7 +9,7 @@ db_US_q <- read.delim(file = 'https://s3.amazonaws.com/files.fred.stlouisfed.org
                       na.strings = '')
 
 # drop row with metadata
-db_US_q <- db_US_q[-(1:2),]
+db_US_q <- db_US_q[-c(1:2, (nrow(db_US_q)-1):nrow(db_US_q)),]
 
 # reformat date
 db_US_q$sasdate <- as.Date(as.character(db_US_q$sasdate), 
@@ -58,3 +58,4 @@ write.zoo(x = db_US_q,
 write.zoo(x = db_US_m,
           file = file.path(data_dir, 'FRED_MD.csv'), 
           col.names = T)
+

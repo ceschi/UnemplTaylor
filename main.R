@@ -34,6 +34,7 @@ library(tictoc)
 # !!!! - internalise multiple horizons
 tic('Whole process')
 tic('Data collection')
+ahead <- 1
 source("USdata_coll.R", verbose=F, echo=F)
 toc()
 

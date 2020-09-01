@@ -18,10 +18,10 @@ possibly_new_stuff.R
 othercount.R
 "EU infl.R"
 UoM_data.py
-downloaded_files/*
-plots/*
+downloaded_files/
+plots/
 processed_data/
-tex_report/*
+tex_report/
 
 
 

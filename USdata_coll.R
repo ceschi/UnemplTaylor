@@ -27,9 +27,9 @@ options(warn=0) # turns warnings back on
 # needs lower security standard 
 # and os dependency
 if (Sys.info()['sysname'] == 'Linux'){
-	meth_philly <- 'wget' # or curl
+	meth_philly <- 'auto' # or curl
 	xtr  <- NULL
-	wwg <- 'wget'
+	wwg <- 'auto'
 }else{
 	meth_philly <- 'auto'
 	xtr  <- '--ciphers DEFAULT@SECLEVEL=1'
@@ -946,17 +946,25 @@ names(shffr) <- c('shffr', 'shffrb')
 ##### Krippner's shadow rate ###################################################
 
 # download xlsx file
-download.file(url = 'https://www.rbnz.govt.nz/-/media/ReserveBank/Files/Publications/Research/additional-research/leo-krippner/us-ea-jp-uk-ssrs-monthly-update.xlsx?la=en&revision=a1d77cad-e95c-47cb-b15d-73b5a6d719fa',
-              destfile = file.path(temp_dir, "krippner_dwnl.xlsx"),
+# download.file(url = 'https://www.rbnz.govt.nz/-/media/ReserveBank/Files/Publications/Research/additional-research/leo-krippner/us-ea-jp-uk-ssrs-monthly-update.xlsx?la=en&revision=a1d77cad-e95c-47cb-b15d-73b5a6d719fa',
+#               destfile = file.path(temp_dir, "krippner_dwnl.xlsx"),
+#               mode = "wb",
+#               quiet = T)
+
+# new xlsx from LJK's file
+download.file(url = 'https://www.ljkmfa.com/wp-content/uploads/2020/08/International_SSR_estimates_NEW_202008.xlsx',
+              destfile = file.path(temp_dir, "krippner_dwnlq.xlsx"),
               mode = "wb",
               quiet = T)
 
+
 # read in US data only
-kripp_ffr <- read_excel(path = file.path(temp_dir, 'krippner_dwnl.xlsx'),
-                        sheet = 2,
-                        range = "A7:B303", 
+kripp_ffr <- read_excel(path = file.path(temp_dir, 'krippner_dwnlq.xlsx'),
+                        sheet = 3,
+                        range = cell_limits(c(8,1), c(NA,2)), 
                         col_names = c('date', 'kripp_shffr'),
-                        col_types = c('date', 'numeric')) %>% 
+                        col_types = c('date', 'numeric')) %>%
+              na.omit() %>% 
   xts(x = .$kripp_shffr, order.by = as.Date(.$date))
 
 kripp_ffr <- aggregate(kripp_ffr, as.yearqtr(as.yearmon(time(kripp_ffr))), xts::last) %>% xts()
@@ -965,7 +973,7 @@ kripp_ffr <- aggregate(kripp_ffr, as.yearqtr(as.yearmon(time(kripp_ffr))), xts::
 
 # stitching
 kripp_ext <- ffr
-kripp_ext["1995/2019-08"] <- kripp_ffr
+kripp_ext["1995/"] <- kripp_ffr
 
 kripp_ffr <- merge(kripp_ext, stats::lag(kripp_ext, 1))
 names(kripp_ffr) <- c("kripp_shffr", "kripp_shffrb")
