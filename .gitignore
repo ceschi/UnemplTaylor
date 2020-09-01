@@ -18,7 +18,10 @@ possibly_new_stuff.R
 othercount.R
 "EU infl.R"
 UoM_data.py
-
+./downloaded_files/
+./plots/*
+./processed_data/*
+./tex_report/*
 
 # Session Data files
 .RData
