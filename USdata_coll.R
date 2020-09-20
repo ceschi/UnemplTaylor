@@ -906,6 +906,34 @@ spf_corepce <- spf_funct('spf_ind_corepce_rate.xlsx', 'COREPCE',
 spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
 
 
+##### market-based inflation expectations ######################################
+mkt_infl <- merge(
+  fivey_forw = fredr_series_observations(series_id = 'T5YIFR',
+                                         frequency = 'q',
+                                         aggregation_method = 'eop'
+                                         ) %>% tbl_xts(),
+
+  be_5y = fredr_series_observations(series_id = 'T5YIE',
+                                     frequency = 'q',
+                                     aggregation_method = 'eop'
+                                     ) %>% tbl_xts(),
+
+  be_10y = fredr_series_observations(series_id = 'T10YIE',
+                                     frequency = 'q',
+                                     aggregation_method = 'eop'
+                                     ) %>% tbl_xts(),
+
+  be_20y = fredr_series_observations(series_id = 'T20YIE',
+                                     frequency = 'q',
+                                     aggregation_method = 'eop'
+                                     ) %>% tbl_xts(),
+
+  be_30y = fredr_series_observations(series_id = 'T30YIE',
+                                     frequency = 'q',
+                                     aggregation_method = 'eop'
+                                     ) %>% tbl_xts()
+
+  )
 
 ##### Wu-Xia Shadow FFR #####
 
@@ -1157,6 +1185,7 @@ db_US <- merge(rates,
                money,
                fiscal,
                spf,
+               mkt_infl,
                shffr,
                kripp_ffr,
                SOC_Michigan,
@@ -1197,7 +1226,7 @@ current_unemp, tot_emp, layoffs, employment_fluct,
 cols, gdp_waves, rates, ffrate, unemployment, gap_output,
 spreads, sp_ret, spread_baa, spread_sp_3m,
 tbill_rate_3m, tbill_rate_10y, tbill_rate_1y,ffrb,
-spread_aaa, aaa,
+spread_aaa, aaa, mkt_infl,
 actual, capacity, y_real_gap, gap_expost, rates.mean,
 base, m1, m2, m3, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
