@@ -1105,20 +1105,9 @@ names(shffr) <- c('shffr', 'shffrb')
 
 ##### Krippner's shadow rate ###################################################
 
-# download xlsx file
-# download.file(url = 'https://www.rbnz.govt.nz/-/media/ReserveBank/Files/Publications/Research/additional-research/leo-krippner/us-ea-jp-uk-ssrs-monthly-update.xlsx?la=en&revision=a1d77cad-e95c-47cb-b15d-73b5a6d719fa',
-#               destfile = file.path(temp_dir, "krippner_dwnl.xlsx"),
-#               mode = "wb",
-#               quiet = T)
 
 # new xlsx from LJK's file
-download.file(url = 'https://www.ljkmfa.com/wp-content/uploads/2020/08/International_SSR_estimates_NEW_202008.xlsx',
-              destfile = file.path(temp_dir, "krippner_dwnlq.xlsx"),
-              mode = "wb",
-              quiet = T)
-'https://www.ljkmfa.com/wp-content/uploads/2020/10/International_SSR_estimates_NEW_202010.xlsx'
-
-# new xlsx from LJK's file
+# email the guy as he keeps changing url
 download.file(url = 'https://www.ljkmfa.com/wp-content/uploads/2020/10/International_SSR_estimates_NEW_202010.xlsx',
               destfile = file.path(temp_dir, "krippner_dwnlq.xlsx"),
               mode = "wb",
