@@ -1055,12 +1055,12 @@ mkt_infl <- merge(
                                      aggregation_method = 'eop'
                                      ) %>% tbl_xts(),
 
-  be_20y = fredr_series_observations(series_id = 'T20YIE',
+  be_20y = fredr_series_observations(series_id = 'T20YIEM',
                                      frequency = 'q',
                                      aggregation_method = 'eop'
                                      ) %>% tbl_xts(),
 
-  be_30y = fredr_series_observations(series_id = 'T30YIE',
+  be_30y = fredr_series_observations(series_id = 'T30YIEM',
                                      frequency = 'q',
                                      aggregation_method = 'eop'
                                      ) %>% tbl_xts()
@@ -1116,7 +1116,13 @@ download.file(url = 'https://www.ljkmfa.com/wp-content/uploads/2020/08/Internati
               destfile = file.path(temp_dir, "krippner_dwnlq.xlsx"),
               mode = "wb",
               quiet = T)
+'https://www.ljkmfa.com/wp-content/uploads/2020/10/International_SSR_estimates_NEW_202010.xlsx'
 
+# new xlsx from LJK's file
+download.file(url = 'https://www.ljkmfa.com/wp-content/uploads/2020/10/International_SSR_estimates_NEW_202010.xlsx',
+              destfile = file.path(temp_dir, "krippner_dwnlq.xlsx"),
+              mode = "wb",
+              quiet = T)
 
 # read in US data only
 kripp_ffr <- read_excel(path = file.path(temp_dir, 'krippner_dwnlq.xlsx'),
@@ -1348,7 +1354,8 @@ db_US <- merge(rates,
                kripp_ffr,
                SOC_Michigan,
                epu, 
-               oil)
+               oil,
+               fin_stress)
 
 #### Quarterly dummies to account for seasonality
 
@@ -1389,8 +1396,7 @@ actual, capacity, y_real_gap, gap_expost, rates.mean,
 base, m1, m2, m3, money, money_g, gdp,
 inizio, fine, surplus.ts, debt_fed,
 debt_fed_share, debt_g, debt_gdp, debt_lev, fiscal,
-surplus_gdp, surplus_season, spf, spf_corecpi,
-spf_corepce, spf_cpi, spf_pce, rev_hist_yoy, rev_hist_pch,
+surplus_gdp, surplus_season, spf, rev_hist_yoy, rev_hist_pch,
 tbill3_ffr, shffr, cfnai,
 socm_indexes, req_fields,
 socm_1y_inflation, socm_5y_inflation, SOC_Michigan,
