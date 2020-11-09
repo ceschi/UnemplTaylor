@@ -86,7 +86,9 @@ instant_pkgs(
   'tbl2xts',
   'tidyverse',
   'xts',
-  'devtools'
+  'devtools',
+  'readr',
+  'rlang'
   )
  )
 
@@ -156,6 +158,7 @@ trendev<-function(mat){
 }
 
 spf_funct <-  function(filnam, typs, ahead=1) {
+  #' *SUPERSEDED BY {spf} BELOW*
   # this function imports the files, reformats,
   # renames, saves in raw format and produces
   # aggregate statistics in XTS format
@@ -187,7 +190,8 @@ spf_funct <-  function(filnam, typs, ahead=1) {
   )
   
   df=read_excel(file.path(temp_dir,filnam), 
-                na='#N/A', col_types=colu) %>%
+                na='#N/A', 
+                col_types=colu) %>%
     spread(ID, paste0(typs,ahead+2)) %>% 
     ts(start=c(1968, 4), frequency=4) %>%
     as.xts()
@@ -219,6 +223,86 @@ spf_funct <-  function(filnam, typs, ahead=1) {
   
   
   return(df_stat)
+}
+
+spf_f <- function(file = file.path(temp_dir, 'spfmicrodata.xlsx'),
+                label,
+                .ahead = 1
+                ){
+  #' This function handles data from the all inclusive file with individual data
+  #' from the Professional Forecasters
+  
+  
+  # require libraries
+  invisible(require(readxl))
+  invisible(require(dplyr))
+  invisible(require(rlang))
+  invisible(require(readr))
+  invisible(require(xts))
+  
+  
+  # ancillary stuff:
+  # vas labels
+  lowerlab <- tolower(label)
+  fore_names <- paste0(lowerlab, c('b','h0', 'h1', 'h2', 'h3', 'h4'))
+  # operative horizon
+  if (.ahead >= 0){
+    horiz <- paste0('h', .ahead)
+  }else{
+    horiz <- 'b1'
+  }
+  # define metrics
+  metrics = c('mean', 'sd', 'median', 'IQR')
+  
+  # operation on data
+  opers <- paste0(metrics,'(', lowerlab, horiz, ', na.rm = T)')
+  
+  # aggregate variable name
+  agg_var <- paste0('spf_', lowerlab, horiz, '_', metrics)
+  
+  
+  
+  # import and tidy up
+  data <-   read_excel(path = file,
+                       col_types = 'numeric',
+                       sheet = label, 
+                       na = '#N/A')  %>% 
+    rename_with(.fn = tolower) %>% 
+    select(-ends_with(c('a', 'b', 'c'))) %>% 
+    rename_at(vars(matches('[0-9]$')), ~ fore_names) %>% 
+    mutate(date = paste0(year, 'Q', quarter),
+           date = as.yearqtr(date),
+           var =  lowerlab) %>% 
+    select(-c(industry, year, quarter))
+  
+  
+  # take tidy data and aggregate
+  agg_data <- data %>% 
+    select(date, id, ends_with(horiz)) %>% 
+    group_by(date) %>% 
+    transmute('{agg_var[1]}' := !!parse_expr(opers[1]),
+              '{agg_var[2]}' := !!parse_expr(opers[2]),
+              '{agg_var[3]}' := !!parse_expr(opers[3]),
+              '{agg_var[4]}' := !!parse_expr(opers[4])) %>% 
+    ungroup() %>% 
+    distinct() %>% 
+    rename_with(.fn = tolower)
+  #' transmute part is a bit new:
+  #' letting agg_var be a string with {} makes rlang evaluate the content
+  #' of the variable agg_var; this assignment is made possible by using := as in
+  #' data.table. on the LHS, !!parse_expr converts and 'unquotes' opers, as if 
+  #' it was a command instead of a string. This holds only in proper env, tho!
+  
+  # now write out the tidy data to disk
+  write_csv(x = data, 
+            file = file.path(data_dir, paste0('spf_ind_', lowerlab, '.csv')), 
+            append = F)
+  
+  # xts conversion
+  out <- xts(agg_data %>% select(-date), order.by = agg_data$date)
+  out[is.nan(out)] <- NA
+  return(out)
+  
 }
 
 hamil_filter <- function(tseries, log=FALSE, p = 4, h = 8){
@@ -328,11 +412,12 @@ ffrate <- merge(ffr, ffrb)
 
 # downloads the big xlsx Greenbook file in
 # a specifically created folder
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/greenbook-data/documentation/gbweb_row_format.xls?la=en',
+download.file('https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/greenbook-data/documentation/gbweb_row_format.xlsx',
               file.path(temp_dir,'Greenbook_allvar_row.xlsx'), mode='wb',
               method = meth_philly,
               extra=xtr,
               quiet = T)
+
 
 ### !!! EMAIL TO FED TO REQUIRE UPDATE !!!
 
@@ -342,16 +427,11 @@ download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-ti
 classi <- c('text', rep('numeric', 14), 'text')
 
 cpi_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'), 
-                            sheet='gPCPI', col_types=classi, na='#N/D')
+                            sheet='gPCPI', col_types=classi, na='#N/A')
 core_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'),
-                             sheet='gPCPIX', col_types=classi, na='#N/D')
+                             sheet='gPCPIX', col_types=classi, na='#N/A')
 deflator_greenbook <- read_excel(file.path(temp_dir,'Greenbook_allvar_row.xlsx'),
-                                 sheet='gPGDP', col_types=classi, na='#N/D')
-
-# # replace NAs
-# cpi_greenbook[cpi_greenbook=='NaN'] <- NA
-# core_greenbook[core_greenbook=='NaN'] <- NA
-# deflator_greenbook[deflator_greenbook=='NaN'] <- NA
+                                 sheet='gPGDP', col_types=classi, na='#N/A')
 
 # drop useless columns
 cpi_greenbook <- cpi_greenbook[,-c(2:5, 16, 15)]
@@ -532,7 +612,7 @@ gap_expost <- (actual-capacity)*100/capacity
 
 # real time gap
 
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/real-time-data/data-files/files/xlsx/routputqvqd.xlsx?la=en',
+download.file('https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/real-time-data/data-files/xlsx/routputqvqd.xlsx',
               file.path(temp_dir,'PhilFed_realtime_realgdp.xlsx'), mode='wb',
               method = meth_philly,
               extra=xtr,
@@ -864,46 +944,98 @@ money <-  merge(money, money_g)
 
 # automate download of the xlsx file, import, run statistics and merge
 
-# download CPI inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_cpi.xlsx?la=en',
-              file.path(temp_dir,'spf_ind_cpi_rate.xlsx'), mode='wb',
-              method = meth_philly,
-              extra=xtr,
-              quiet = T)
+# get the file first
+download.file(url = 'https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/historical-data/spfmicrodata.xlsx',
+              mode='wb',
+              # method = meth_philly,
+              # extra=xtr,
+              quiet = T,
+              destfile = file.path(temp_dir,'spfmicrodata.xlsx')
+              )
 
-# download CORE CPI inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corecpi.xlsx?la=en',
-              file.path(temp_dir,'spf_ind_corecpi_rate.xlsx'), mode='wb',
-              method = meth_philly,
-              extra=xtr,
-              quiet = T)
-
-# download PCE inflation rate raw file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_pce.xlsx?la=en',
-              file.path(temp_dir,'spf_ind_pce_rate.xlsx'), mode='wb',
-              method = meth_philly,
-              extra=xtr,
-              quiet = T)
-
-# download CORE PCE inflation rate file for individuals in the SPF
-download.file('https://www.philadelphiafed.org/-/media/research-and-data/real-time-center/survey-of-professional-forecasters/data-files/files/individual_corepce.xlsx?la=en',
-              file.path(temp_dir,'spf_ind_corepce_rate.xlsx'), mode='wb',
-              method = meth_philly,
-              extra=xtr,
-              quiet = T)
+## DEFL ##
 
 
+# get three files
+download.file(url = 'https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/data-files/files/mean_pgdp_growth.xlsx',
+              mode='wb',
+              # method = meth_philly,
+              # extra=xtr,
+              quiet = T,
+              destfile = file.path(temp_dir,'spf_defl_gmean.xlsx')
+)
 
-spf_cpi <- spf_funct('spf_ind_cpi_rate.xlsx', 'CPI',
-                     ahead=ahead)
-spf_corecpi <- spf_funct('spf_ind_corecpi_rate.xlsx', 'CORECPI',
-                         ahead=ahead)
-spf_pce <- spf_funct('spf_ind_pce_rate.xlsx','PCE',
-                     ahead=ahead)
-spf_corepce <- spf_funct('spf_ind_corepce_rate.xlsx', 'COREPCE',
-                         ahead=ahead)
+download.file(url = 'https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/data-files/files/median_pgdp_growth.xlsx',
+              mode='wb',
+              # method = meth_philly,
+              # extra=xtr,
+              quiet = T,
+              destfile = file.path(temp_dir,'spf_defl_gmedian.xlsx')
+)
 
-spf <- merge(spf_cpi,spf_corecpi,spf_pce, spf_corepce)
+download.file(url = 'https://www.philadelphiafed.org/-/media/frbp/assets/surveys-and-data/survey-of-professional-forecasters/data-files/files/dispersion_pgdp.xlsx',
+              mode='wb',
+              # method = meth_philly,
+              # extra=xtr,
+              quiet = T,
+              destfile = file.path(temp_dir,'spf_defl_disper.xlsx')
+)
+
+temp_varname <- paste0('spf_deflh', ifelse(ahead >= 0, ahead, NA), '_mean')
+spf_defl_mea <- read_excel(path = file.path(temp_dir,'spf_defl_gmean.xlsx'), 
+                           col_types = 'numeric', 
+                           na = '#N/A') %>% 
+  rename_with(.fn = tolower) %>% 
+  mutate(date = paste0(year, 'Q', quarter),
+         date = as.yearqtr(date)) %>% 
+  select(-c(year, quarter)) %>% 
+  select(date, ends_with(as.character(2+ahead))) %>% 
+  rename("{temp_varname}" := last_col())%>% 
+  xts(x = .[,2], order.by = .$date)
+
+temp_varname <- paste0('spf_deflh', ifelse(ahead >= 0, ahead, NA), '_median')
+spf_defl_med <- read_excel(path = file.path(temp_dir,'spf_defl_gmedian.xlsx'), 
+                           col_types = 'numeric', 
+                           na = '#N/A') %>% 
+  rename_with(.fn = tolower) %>% 
+  mutate(date = paste0(year, 'Q', quarter),
+         date = as.yearqtr(date)) %>% 
+  select(-c(year, quarter)) %>% 
+  select(date, ends_with(as.character(2+ahead))) %>% 
+  rename("{temp_varname}" := last_col()) %>% 
+  xts(x = .[,2], order.by = .$date)
+
+
+temp_varname <- paste0('spf_deflh', ifelse(ahead >= 0, ahead, NA), '_iqr')
+spf_defl_iqr <- read_excel(path = file.path(temp_dir,'spf_defl_disper.xlsx'), 
+                           # col_types = 'numeric', 
+                           na = '#N/A', skip = 9) %>% 
+  select(-contains('5')) %>% 
+  rename_with(.fn = tolower) %>% 
+  rename(date = 'survey_date(t)') %>% 
+  mutate(date = as.yearqtr(date)) %>% 
+  select(date, contains(as.character(paste0('+', ahead)))) %>% 
+  rename('{temp_varname}' := last_col())%>% 
+  xts(x = .[,2], order.by = .$date)
+
+
+spf_defl <- merge(spf_defl_mea, spf_defl_med, spf_defl_iqr)
+
+rm(temp_varname, spf_defl_mea, spf_defl_med, spf_defl_iqr)
+
+
+# get the whole set of PCE/CPI/defl
+spf <- pmap(.l = list(label = list('CPI', 'CORECPI', 'PCE', 'COREPCE'),
+                      .ahead = lapply(rep(ahead, 4), list)
+                      ),
+            .f = spf_f) %>% 
+  do.call(what = merge.xts, 
+          args = .) %>% 
+  merge(., spf_defl)
+
+rm(spf_defl)
+
+
 
 
 ##### market-based inflation expectations ######################################
@@ -1171,6 +1303,32 @@ names(epu_cat_ts) <- c('epu_econpol', 'epu_monpol', 'epu_fiscal', 'epu_taxes',
 epu <- merge(epu_aggregate_ts,
              epu_aggregate_comp_ts,
              epu_cat_ts)
+
+#### Financial risk measures and miscellanea ###################################
+
+fin_stress <- merge(
+  stress_eop = fredr_series_observations(series_id = 'STLFSI2',
+                                         frequency = 'q',
+                                         aggregation_method = 'eop'
+                                         ) %>% tbl_xts(),
+  
+  stress_avg = fredr_series_observations(series_id = 'STLFSI2',
+                                         frequency = 'q',
+                                         aggregation_method = 'avg'
+                                         ) %>% tbl_xts(),
+  
+  kansas_eop = fredr_series_observations(series_id = 'KCFSI',
+                                         frequency = 'q',
+                                         aggregation_method = 'eop'
+                                         ) %>% tbl_xts(),
+  
+  kansas_avg = fredr_series_observations(series_id = 'KCFSI',
+                                         frequency = 'q',
+                                         aggregation_method = 'avg'
+                                         ) %>% tbl_xts()
+)
+
+
 
 #### Merge to dataset ####
 
