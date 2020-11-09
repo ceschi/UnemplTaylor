@@ -258,7 +258,7 @@ spf_f <- function(file = file.path(temp_dir, 'spfmicrodata.xlsx'),
   opers <- paste0(metrics,'(', lowerlab, horiz, ', na.rm = T)')
   
   # aggregate variable name
-  agg_var <- paste0('spf_', lowerlab, horiz, '_', metrics)
+  agg_var <- paste0('spf_', lowerlab,'_', horiz, '_', metrics)
   
   
   
